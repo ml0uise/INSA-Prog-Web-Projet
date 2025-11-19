@@ -24,14 +24,19 @@ https://etud.insa-toulouse.fr/~cdura/3A-Projet-Prog-Web
     - Last 10 highscores
     - Ask for user name when adding to highscore
 
-- Déplacement player: F
-    - Détection touche
+- Player: F
+    - Déplacement avec détection touche
+    - PV
 
 - Déplacemnt obstacles: F
     - Check si déplacement possible avant de générer nouveau blocs (2* hauteur du player?)
     - 5 colonnes
+    - F / Fx
 
 - Détection hitbox: C
+    - Collision avec F: INSTA DEATH
+    - Collision avec Fx: -1PV
+    - Collision avec A: +1PV
 
 - Ecran accueil: L
 
@@ -46,6 +51,7 @@ https://etud.insa-toulouse.fr/~cdura/3A-Projet-Prog-Web
     - Score
     - Titre
     - Highscore
+    - PV (coeurs)
 
 - Graphismes: ChatGPT
 
