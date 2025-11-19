@@ -55,6 +55,8 @@ https://etud.insa-toulouse.fr/~cdura/3A-Projet-Prog-Web
 
 - Graphismes: ChatGPT
 
+- Sound design: ChatGPT
+
 - Rapport: L
 
 # Références
