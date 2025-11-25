@@ -19,3 +19,7 @@ function set_score_text() {
     const SPAN = document.querySelector("#score span");
     SPAN.textContent = String(get_score_session());
 }
+
+function on_load() {
+    set_score_text();
+}
