@@ -3,8 +3,25 @@
 <head>
     <meta charset="utf-8">
     <title>INSA Surfer</title>
-</head>
-<body>
 
+    <link rel="stylesheet" href="assets/death.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+
+    <!-- Necesarly in head because needed for onload -->
+    <script src="assets/death.js"></script>
+    <script src="assets/cookies.js"></script>
+</head>
+<body onload="set_score_text()">
+    <div class="center" id="score">
+        Score:&nbsp;<span></span>
+    </div>
+
+    <div class="center" id="highscores">
+        HIGHSCORES
+    </div>
+
+    <div class="center">
+        <img src="assets/retry.png" id="retry" onclick="retry()">
+    </div>
 </body>
 </html>

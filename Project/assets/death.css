@@ -1,0 +1,53 @@
+.center {
+    display: -webkit-box;  /* iOS 6-, Safari 3.1-6, BB7 */
+    display: -ms-flexbox;  /* TWEENER - IE 10 */
+    display: -webkit-flex; /* Safari 6.1+. iOS 7.1+, BB10 */
+    display: flex;         /* Firefox, Chrome, Opera */
+
+    justify-content: center;
+    align-items: center;
+
+    width: 100%;
+}
+
+
+#score {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 2em;
+    color: #00faff;
+    text-transform: uppercase;
+
+    /* Neon Glow Layers */
+    text-shadow:
+    0 0 4px #00faff,
+    0 0 10px #00faff,
+    0 0 20px #00faff,
+    0 0 40px #00e1ff,
+    0 0 80px #00e1ff;
+}
+
+#score {
+    height: 10vh;
+}
+
+#highscores {
+    height: 70vh;
+    background-color: #0f0;
+}
+
+.hidden {
+    opacity: 0;
+}
+
+#retry {
+    height: 15vh;
+    padding: 1vh;
+    background-color: #00f;
+    transition: top ease 0.5s;
+}
+
+#retry:hover {
+    transition-duration: 10ms;
+    transition-property: transform;
+    transform: translate(5px, 5px);
+}
