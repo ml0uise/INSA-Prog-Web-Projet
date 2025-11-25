@@ -31,13 +31,13 @@ var canvas = document.getElementById("myCanvas");
     // - score  : gain de score (A > B > C > D > E)
     // - lifeDelta : variation de vie (Fx, F)
     var noteTypes = [
-        { name: "A",  src: "assets/A.png",  weight: 3, score: 50, lifeDelta: 0   },
-        { name: "B",  src: "assets/B.png",  weight: 4, score: 40, lifeDelta: 0   },
+        { name: "A",  src: "assets/A.png",  weight: 3, score: 100, lifeDelta: 0   },
+        { name: "B",  src: "assets/B.png",  weight: 4, score: 50, lifeDelta: 0   },
         { name: "C",  src: "assets/C.png",  weight: 5, score: 30, lifeDelta: 0   },
         { name: "D",  src: "assets/D.png",  weight: 6, score: 20, lifeDelta: 0   },
         { name: "E",  src: "assets/E.png",  weight: 7, score: 10, lifeDelta: 0   },
         { name: "Fx", src: "assets/Fx.png", weight: 4, score: 0,  lifeDelta: -0.5 },
-        { name: "F",  src: "assets/F.png",  weight: 2, score: 0,  lifeDelta: -1  }
+        { name: "F",  src: "assets/F.png",  weight: 3, score: 0,  lifeDelta: -1  }
     ];
 
     // Préchargement des images
@@ -70,7 +70,7 @@ var canvas = document.getElementById("myCanvas");
         var x = Math.random() * (canvas.width - noteWidth);
 
         // Mise à jour du niveau de vitesse :
-        var speed = 2 + (difficultyLevel / 4) + Math.random() * difficultyLevel;
+        var speed = 2 + (difficultyLevel / 10) + Math.random() * difficultyLevel;
 
         notes.push({
             x: x,
@@ -235,10 +235,10 @@ var canvas = document.getElementById("myCanvas");
 
         // Mouvement du personnage
         if (rightPressed && caracterX < canvas.width - caracterWidth) {
-            caracterX += 10;
+            caracterX += 10 + (difficultyLevel / 5);
         }
         else if (leftPressed && caracterX > 0) {
-            caracterX -= 10;
+            caracterX -= 10 + (difficultyLevel / 5);
         }
 
         requestAnimationFrame(draw);
