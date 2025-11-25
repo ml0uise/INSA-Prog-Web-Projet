@@ -54,7 +54,7 @@ https://etud.insa-toulouse.fr/~cdura/3A-Projet-Prog-Web
     - PV (coeurs)
 
 - Graphismes: ChatGPT
-
+ 
 - Sound design: ChatGPT
 
 - Rapport: L
