@@ -1,3 +1,38 @@
+var musicList = [
+    "assets/VIdeogame Loops/Around the Bend.WAV",
+    "assets/VIdeogame Loops/Behind the column.WAV",
+    "assets/VIdeogame Loops/Catch The Mystery.WAV",
+    "assets/VIdeogame Loops/Dark Intentions.WAV",
+    "assets/VIdeogame Loops/Fancy Cakes.WAV",
+    "assets/VIdeogame Loops/In defense of my stuff.WAV",
+    "assets/VIdeogame Loops/In early time.WAV",
+    "assets/VIdeogame Loops/In the back pocket_100 BPM.WAV",
+    "assets/VIdeogame Loops/In the depths of the cave.WAV",
+    "assets/VIdeogame Loops/In The Champ Elysees.WAV",
+    "assets/VIdeogame Loops/Inside Dreams.WAV",
+    "assets/VIdeogame Loops/In the spinning world.WAV",
+    "assets/VIdeogame Loops/Killing Flies.WAV",
+    "assets/VIdeogame Loops/The Crane Dance.WAV",
+    "assets/VIdeogame Loops/The essence of good things.WAV",
+    "assets/VIdeogame Loops/Under the hot sun.WAV",
+    "assets/VIdeogame Loops/Waiting For Events.WAV",
+    "assets/VIdeogame Loops/With Dirty Hands.WAV",
+    "assets/VIdeogame Loops/With loose cords.WAV",
+    "assets/VIdeogame Loops/With torn pants.WAV"
+];
+
+function pickRandomMusic() {
+    let index = Math.floor(Math.random() * musicList.length);
+    return musicList[index];
+}
+
+let chosenTrack = pickRandomMusic();
+backgroundMusic = new Audio(chosenTrack);
+backgroundMusic.loop = true;
+backgroundMusic.volume = 1;
+
+backgroundMusic.play().catch(() => {});
+
 function blink_retry() {
     const RETRY = document.querySelector("#retry");
     

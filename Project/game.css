@@ -1,0 +1,24 @@
+* { padding: 0; margin: 0; }
+
+body {
+    background-image: url("assets/background.png");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+canvas { 
+    background: #eee; 
+    width: 60vw;
+    height: auto;
+    max-height: 80vh;
+}
