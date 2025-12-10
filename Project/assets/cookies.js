@@ -46,14 +46,6 @@ class Player {
         this.name = name;
         this.score = score;
     }
-
-    getName() {
-        return this.name;
-    }
-
-    getScore() {
-        return this.score;
-    }
 }
 
 
@@ -96,6 +88,8 @@ function change_name() {
     let name = prompt("Enter your name: ", def);
 
     sessionStorage.setItem("name", name);
+
+    return name;
 }
 
 
@@ -114,6 +108,8 @@ function get_highscores() {
 }
 
 function update_highscores(score) {
+    change_name(); // After tests, it seems better to let the player change name anytime
+
     let actual = get_highscores();
     let player = new Player(get_name(), score);
 

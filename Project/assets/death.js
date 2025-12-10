@@ -11,12 +11,13 @@ function blink_retry() {
 
 setInterval(blink_retry, 1000);
 
-function retry() {
-    document.location.href = "../game.html";
-}
-
 function will_change_highscores() {
-    let highscores = get_highscores();
+    const highscores = get_highscores();
+
+    if (highscores.length === 0) {
+        return false;
+    }
+
     let min_score = highscores.slice(-1)[0].score;
 
     if (min_score <= get_score_session()) {
@@ -31,6 +32,31 @@ function set_score_text() {
     SPAN.textContent = String(get_score_session());
 }
 
+function set_highscore_list() {
+    const OL = document.querySelector("#highscores ol");
+    const HIGHSCORES = get_highscores();
+
+    let elem;
+    let txt;
+    let score;
+
+    OL.innerHTML = ""; // Reset list
+
+    for (let i = 0; i < 10; i++) {
+        elem = document.createElement("li");
+
+        if (HIGHSCORES.length - 1 >= i) {
+            score = HIGHSCORES[i].name + " : " + HIGHSCORES[i].score;
+        } else {
+            score = "..........";
+        }
+
+        txt = document.createTextNode(score);
+        elem.appendChild(txt);
+        OL.appendChild(elem);
+    }
+}
+
 function on_load() {
     if (will_change_highscores()) {
         change_name();
@@ -38,4 +64,5 @@ function on_load() {
     }
 
     set_score_text();
+    set_highscore_list();
 }

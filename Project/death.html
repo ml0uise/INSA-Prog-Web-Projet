@@ -13,15 +13,17 @@
 </head>
 <body onload="on_load()">
     <div class="center" id="score">
-        Score:&nbsp;<span></span>
+        Score:&nbsp;<span>0</span>
     </div>
 
     <div class="center" id="highscores">
-        HIGHSCORES
+        <ol></ol>  <!-- Wil be filled by JS -->
     </div>
 
     <div class="center">
-        <img src="assets/retry.png" id="retry" onclick="retry()">
+        <a href="./game.html">
+            <img src="assets/retry.png" id="retry">
+        </a>
     </div>
 </body>
 </html>

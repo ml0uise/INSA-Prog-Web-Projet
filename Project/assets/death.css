@@ -32,7 +32,31 @@
 
 #highscores {
     height: 70vh;
-    background-color: #0f0;
+}
+
+#highscores ol {
+    counter-reset: section;
+    -moz-column-count: 2;
+    -moz-column-gap: 5vw;
+    -webkit-column-count: 2;
+    -webkit-column-gap: 5vw;
+    column-count: 2;
+    column-gap: 20vw;
+}
+
+#highscores ol li {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 2em;
+    color: #b400ff;
+    text-transform: uppercase;
+
+    /* Neon Glow Layers */
+    text-shadow:
+    0 0 4px  #b400ff,
+    0 0 10px #b400ff,
+    0 0 20px #b400ff,
+    0 0 40px #d34dff,
+    0 0 80px #d34dff;
 }
 
 .hidden {
