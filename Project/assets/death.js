@@ -2,11 +2,18 @@ function blink_retry() {
     const RETRY = document.querySelector("#retry");
     
     // Toggle visibility
-    if (RETRY.className === "hidden") {
+    if (RETRY.className === "hidden" || RETRY.matches(':hover')) {
         RETRY.className = "";
     } else {
         RETRY.className = "hidden";
     }
+}
+
+function add_blink_hover_listener() {
+    const RETRY = document.querySelector("#retry");
+    RETRY.addEventListener('mouseenter', () => {
+    blink_retry();
+    });
 }
 
 setInterval(blink_retry, 1000);
@@ -65,4 +72,6 @@ function on_load() {
 
     set_score_text();
     set_highscore_list();
+
+    add_blink_hover_listener();
 }
