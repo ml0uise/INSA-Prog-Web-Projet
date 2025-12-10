@@ -321,21 +321,9 @@ function drawLives() {
     ctx.font = "bold 32px 'Press Start 2P', cursive";
     ctx.textBaseline = "top";
     ctx.textAlign = "right";
-    ctx.fillStyle = "#00faff";
-
-    // Glow néon bleu
-    ctx.shadowColor = "#00faff";
-    ctx.shadowBlur = 8;
 
     const heartString = getHeartString(lives);
 
-    ctx.fillText(heartString, canvas.width - 20, 20);
-
-    ctx.shadowColor = "#00e1ff";
-    ctx.shadowBlur = 20;
-    ctx.fillText(heartString, canvas.width - 20, 20);
-
-    ctx.shadowBlur = 40;
     ctx.fillText(heartString, canvas.width - 20, 20);
 
     ctx.restore();
