@@ -10,29 +10,92 @@
     width: 100%;
 }
 
-
-#score {
+#game-title {
     font-family: 'Press Start 2P', cursive;
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     text-transform: uppercase;
 
-    color: #39ff14; /* Neon Green */
+    height: 10vh;
 
-    /* Neon Glow Layers */
+    color: #ffffff;
+
+    -webkit-text-stroke: 2px #ff1a1a;
+
     text-shadow:
-    0 0 4px  #39ff14,
-    0 0 10px #39ff14,
-    0 0 20px #39ff14,
-    0 0 40px #00ff00,
-    0 0 80px #00ff00;
+        0 0 4px  #ff1a1a,
+        0 0 10px #ff1a1a,
+        0 0 20px #ff1a1a,
+        0 0 40px #ff0000,
+        0 0 80px #b00000;
 }
 
 #score {
     height: 10vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
+#score-value {
+    display: inline-block;
+    width: fit-content;
+
+    font-family: 'Press Start 2P', cursive;
+    font-size: 2.2rem;
+    text-transform: uppercase;
+
+    animation: scoreBlink 1.5s infinite;
+
+    color: #fff700;
+
+    background: rgba(30, 30, 30, 0.85);
+    padding: 12px 18px;
+    border-radius: 10px;
+
+    border: 2px solid #fff700;
+
+    box-shadow:
+        0 0 6px  #fff700,
+        0 0 14px #ffea00;
+
+    text-shadow:
+        0 0 2px  #fff700,
+        0 0 6px  #ffea00;
+}
+
+@keyframes scoreBlink {
+    /* Allumé */
+    0%, 45%, 100% {
+        opacity: 1;
+        box-shadow:
+            0 0 6px  #fff700,
+            0 0 14px #ffea00;
+    }
+
+    /* Extinction courte */
+    50% {
+        opacity: 0.35;
+        box-shadow:
+            0 0 2px  #fff700;
+    }
+
+    /* Retour rapide */
+    55% {
+        opacity: 1;
+        box-shadow:
+            0 0 8px  #fff700,
+            0 0 18px #ffea00;
+    }
+}
+
+
+
+
 #highscores {
-    height: 70vh;
+    display: flex;
+    flex-direction: column;
+    height: 50vh;
 }
 
 #highscores ol {
@@ -45,15 +108,21 @@
     column-gap: 25vw;
 }
 
+#highscores-title {
+    color: #ffffff;
+    -webkit-text-stroke: 2px #00faff;
+}
+
 #highscores ol li {
+    color: #00faff;
+}
+
+#highscores-title, #highscores ol li {
     font-family: 'Press Start 2P', cursive;
     font-size: 2rem;
     line-height: 3rem;
     text-transform: uppercase;
 
-    color: #00faff;
-
-    /* Neon Glow Layers */
     text-shadow:
     0 0 4px #00faff,
     0 0 10px #00faff,
@@ -70,8 +139,36 @@
     border-radius: 2vh;
     height: 15vh;
     padding: 1vh;
+
     background-color: #00f;
-    transition: top ease 0.5s;
+
+    box-shadow:
+        0 0 6px  rgba(0, 0, 255, 0.7),
+        0 0 16px rgba(0, 0, 255, 0.6),
+        0 0 32px rgba(0, 0, 255, 0.45);
+
+    animation: retryPulse 3.2s infinite;
+
+    transition: transform 0.15s ease;
+}
+
+@keyframes retryPulse {
+    0%, 55% {
+        opacity: 1;
+        filter: brightness(1.1);
+    }
+
+    60% { opacity: 0.25; filter: brightness(0.8); }
+    65% { opacity: 1;    filter: brightness(1.2); }
+    70% { opacity: 0.25; filter: brightness(0.8); }
+    75% { opacity: 1;    filter: brightness(1.2); }
+    80% { opacity: 0.25; filter: brightness(0.8); }
+    85% { opacity: 1;    filter: brightness(1.2); }
+
+    100% {
+        opacity: 1;
+        filter: brightness(1.1);
+    }
 }
 
 #retry:hover {
@@ -79,6 +176,7 @@
     transition-property: transform;
     transform: translate(5px, 5px);
 }
+
 
 body {
   background-repeat: no-repeat;

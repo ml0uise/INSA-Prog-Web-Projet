@@ -2,26 +2,31 @@
 <html lang="fr">
 <head>
     <meta charset="utf-8">
-    <title>INSA Surfer</title>
+    <title>INSA’s Grade Rain of Death</title>
     <link rel="icon" type="image/x-icon" href="/assets/pixel-caracter.png">
     <link rel="stylesheet" href="death.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
 
     <!-- Necesarly in head because needed for onload -->
-    <script src="death.js"></script>
     <script src="cookies.js"></script>
+    <script src="death.js"></script>
 </head>
 <body onload="on_load()" background="assets/background.png">
+    <div class="center" id="title">
+        <h1 id="game-title">INSA’s Grade Rain of Death</h1>
+    </div>
+
     <div class="center" id="score">
-        Score:&nbsp;<span>0</span>
+        <div id="score-value">Score:&nbsp;<span>0</span></div>
     </div>
 
     <div class="center" id="highscores">
+        <h2 id="highscores-title">Highscores</h2>
         <ol></ol>  <!-- Wil be filled by JS -->
     </div>
 
     <div class="center">
-        <a href="./game.html">
+        <a href="index.html?retry=true">
             <img src="assets/retry.png" id="retry">
         </a>
     </div>

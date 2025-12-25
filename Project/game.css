@@ -7,6 +7,7 @@ body {
     background-size: cover;
 
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 }
@@ -16,9 +17,51 @@ html, body {
     width: 100%;
 }
 
-canvas { 
+.center {
+    display: -webkit-box;  /* iOS 6-, Safari 3.1-6, BB7 */
+    display: -ms-flexbox;  /* TWEENER - IE 10 */
+    display: -webkit-flex; /* Safari 6.1+. iOS 7.1+, BB10 */
+    display: flex;         /* Firefox, Chrome, Opera */
+
+    justify-content: center;
+    align-items: center;
+
+    width: 100%;
+}
+
+#game-title {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 2.2rem;
+    text-transform: uppercase;
+
+    height: 10vh;
+
+    color: #ffffff;
+
+    -webkit-text-stroke: 2px #ff1a1a;
+
+    text-shadow:
+        0 0 4px  #ff1a1a,
+        0 0 10px #ff1a1a,
+        0 0 20px #ff1a1a,
+        0 0 40px #ff0000,
+        0 0 80px #b00000;
+}
+
+canvas {
     background: #eee; 
     width: 60vw;
     height: auto;
     max-height: 80vh;
+
+    border-radius: 18px;
+
+    border: 3px solid #00faff;
+
+    /* Effet néon */
+    box-shadow:
+        0 0 6px #00faff,
+        0 0 14px #00faff,
+        0 0 28px #00e1ff,
+        0 0 48px #00e1ff;
 }

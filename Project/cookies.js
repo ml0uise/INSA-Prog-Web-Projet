@@ -86,6 +86,10 @@ function change_name() {
     }
 
     let name = prompt("Enter your name: ", def);
+    
+    if (name === null) {
+        name = "Player";
+    }
 
     sessionStorage.setItem("name", name);
 
