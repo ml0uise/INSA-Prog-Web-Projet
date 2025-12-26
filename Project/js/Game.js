@@ -222,9 +222,9 @@ const gamePrototype = {
         const r = Math.random() * this.totalWeight;
         let sum = 0;
 
-        for (let i = 0; i < this.noteTypes.length; i++) {
-            sum += this.noteTypes[i].weight;
-            if (r < sum) return this.noteTypes[i];
+        for (const element of this.noteTypes) {
+            sum += element.weight;
+            if (r < sum) return element;
         }
 
         // Fallback (should never happen with valid weights).
@@ -319,10 +319,8 @@ const gamePrototype = {
     },
 
     drawNotes() {
-        let i = 0;
-        while (i < this.notes.length) {
-            this.notes[i].draw(this.ctx);
-            i++;
+        for (const index in this.notes) {
+            this.notes[index].draw(this.ctx);
         }
     },
 
@@ -407,7 +405,8 @@ const gamePrototype = {
             x -= spacing;
         }
 
-        for (let i = 0; i < full; i++) {
+        let i = 0;
+        while (i < full) {
             x -= heartSize;
 
             this.ctx.save();
@@ -417,6 +416,8 @@ const gamePrototype = {
             this.ctx.restore();
 
             x -= spacing;
+
+            i++;
         }
 
         this.ctx.restore();
