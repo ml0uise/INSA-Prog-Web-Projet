@@ -103,16 +103,21 @@ const gamePrototype = {
 
     /**
      * Auto-starts the game when returning from a "retry" flow.
-     * Expects the URL to contain ?retry.
+     * Expects the URL to contain ?retry=true
      */
     tryAutoStartFromURL() {
         const params = new URLSearchParams(window.location.search);
-        if (!params.has("retry")) return;
+
+        // Validation: ensure "retry" exists and is explicitly set to "true"
+        if (!params.has("retry") || params.get("retry") !== "true") {
+            return;
+        }
 
         this.gameStarted = true;
         this.startDifficultyRamp();
         this.playSfx("backgroundMusic");
     },
+
 
     /* =========================
        Input handling
