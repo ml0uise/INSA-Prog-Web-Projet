@@ -212,6 +212,15 @@ const gamePrototype = {
         this.lives = 0;
         this.gameOver = true;
 
+        // Stop background music before playing the game over SFX.
+        const bgm = this.sfx.backgroundMusic;
+        if (bgm) {
+            try {
+                bgm.pause();
+                bgm.currentTime = 0;
+            } catch (e) {}
+        }
+
         this.playSfx("gameOver");
     },
 
@@ -436,48 +445,103 @@ const gamePrototype = {
         const blink = 0.25 + 0.75 * (0.5 + 0.5 * Math.sin(t * Math.PI * 4));
         this.ctx.globalAlpha = blink;
 
-        this.ctx.font = "bold 36px 'Press Start 2P', cursive";
         this.ctx.textAlign = "center";
         this.ctx.textBaseline = "middle";
+
+        /* =========================
+        MAIN START MESSAGE
+        ========================= */
+
+        this.ctx.font = "bold 36px 'Press Start 2P', cursive";
         this.ctx.fillStyle = "#00faff";
 
         // Line 1
         this.ctx.shadowColor = "#00faff";
         this.ctx.shadowBlur = 10;
-        this.ctx.fillText("PRESS LEFT/RIGHT ARROW", this.canvas.width / 2, this.canvas.height / 2 - 60);
+        this.ctx.fillText(
+            "PRESS LEFT/RIGHT ARROW",
+            this.canvas.width / 2,
+            this.canvas.height / 2 - 70
+        );
 
         this.ctx.shadowColor = "#00e1ff";
         this.ctx.shadowBlur = 25;
-        this.ctx.fillText("PRESS LEFT/RIGHT ARROW", this.canvas.width / 2, this.canvas.height / 2 - 60);
+        this.ctx.fillText(
+            "PRESS LEFT/RIGHT ARROW",
+            this.canvas.width / 2,
+            this.canvas.height / 2 - 70
+        );
 
         this.ctx.shadowBlur = 50;
-        this.ctx.fillText("PRESS LEFT/RIGHT ARROW", this.canvas.width / 2, this.canvas.height / 2 - 60);
+        this.ctx.fillText(
+            "PRESS LEFT/RIGHT ARROW",
+            this.canvas.width / 2,
+            this.canvas.height / 2 - 70
+        );
 
         // Line 2
         this.ctx.shadowColor = "#00faff";
         this.ctx.shadowBlur = 10;
-        this.ctx.fillText("TO START", this.canvas.width / 2, this.canvas.height / 2 + 10);
+        this.ctx.fillText(
+            "TO START",
+            this.canvas.width / 2,
+            this.canvas.height / 2 - 10
+        );
 
         this.ctx.shadowColor = "#00e1ff";
         this.ctx.shadowBlur = 25;
-        this.ctx.fillText("TO START", this.canvas.width / 2, this.canvas.height / 2 + 10);
+        this.ctx.fillText(
+            "TO START",
+            this.canvas.width / 2,
+            this.canvas.height / 2 - 10
+        );
 
         this.ctx.shadowBlur = 50;
-        this.ctx.fillText("TO START", this.canvas.width / 2, this.canvas.height / 2 + 10);
+        this.ctx.fillText(
+            "TO START",
+            this.canvas.width / 2,
+            this.canvas.height / 2 - 10
+        );
 
-        // Line 3 (smaller font for the secondary action)
+        /* =========================
+        SECONDARY ACTION
+        ========================= */
+
         this.ctx.font = "bold 22px 'Press Start 2P', cursive";
 
         this.ctx.shadowColor = "#00faff";
         this.ctx.shadowBlur = 10;
-        this.ctx.fillText("OR PRESS SPACE FOR HIGHSCORES", this.canvas.width / 2, this.canvas.height / 2 + 80);
+        this.ctx.fillText(
+            "OR PRESS SPACE FOR HIGHSCORES",
+            this.canvas.width / 2,
+            this.canvas.height / 2 + 50
+        );
 
         this.ctx.shadowColor = "#00e1ff";
         this.ctx.shadowBlur = 25;
-        this.ctx.fillText("OR PRESS SPACE FOR HIGHSCORES", this.canvas.width / 2, this.canvas.height / 2 + 80);
+        this.ctx.fillText(
+            "OR PRESS SPACE FOR HIGHSCORES",
+            this.canvas.width / 2,
+            this.canvas.height / 2 + 50
+        );
 
-        this.ctx.shadowBlur = 50;
-        this.ctx.fillText("OR PRESS SPACE FOR HIGHSCORES", this.canvas.width / 2, this.canvas.height / 2 + 80);
+        /* =========================
+        AUDIO NOTICE (NON-BLINKING)
+        ========================= */
+
+        // Disable blinking for the audio hint to keep it readable.
+        this.ctx.globalAlpha = 0.9;
+
+        this.ctx.font = "bold 18px 'Press Start 2P', cursive";
+        this.ctx.fillStyle = "#ffffff";
+        this.ctx.shadowColor = "#ffffff";
+        this.ctx.shadowBlur = 6;
+
+        this.ctx.fillText(
+            "ENABLE SOUND FOR THE BEST EXPERIENCE",
+            this.canvas.width / 2,
+            this.canvas.height / 2 + 110
+        );
 
         this.ctx.restore();
     },
@@ -513,7 +577,7 @@ const gamePrototype = {
         if (!this.gameOverAlreadyHandled) {
             this.gameOverAlreadyHandled = true;
 
-            // Keep your existing implementation (assumed to exist in your project).
+            // Set score to the session with cookie.js function
             set_score_session(this.score);
 
             setTimeout(() => {

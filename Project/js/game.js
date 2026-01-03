@@ -11,7 +11,7 @@ const ctx = canvas.getContext("2d");
 
 // Images
 const background = new Image();
-background.src = "../assets/images/amphiteater.png";
+background.src = "../assets/images/amphiteater.jpg";
 
 const caracter = new Image();
 caracter.src = "../assets/images/pixel-caracter.png";
