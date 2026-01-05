@@ -112,7 +112,8 @@ const gamePrototype = {
         if (!params.has("retry") || params.get("retry") !== "true") {
             return;
         }
-
+        
+        change_name();
         this.gameStarted = true;
         this.startDifficultyRamp();
         this.playSfx("backgroundMusic");
@@ -132,6 +133,7 @@ const gamePrototype = {
                 document.location.href = "highscores.html";
                 return;
             } else if (e.code === "ArrowLeft" || e.code === "ArrowRight") {
+                change_name();
                 this.gameStarted = true;
                 this.startDifficultyRamp();
                 this.playSfx("backgroundMusic");

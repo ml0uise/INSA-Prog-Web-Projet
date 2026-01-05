@@ -112,8 +112,6 @@ function get_highscores() {
 }
 
 function update_highscores(score) {
-    change_name(); // After tests, it seems better to let the player change name anytime
-
     let actual = get_highscores();
     let player = new Player(get_name(), score);
 
