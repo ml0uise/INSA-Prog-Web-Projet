@@ -85,11 +85,15 @@ function change_name() {
         def = old_name;
     }
 
-    let name = prompt("Enter your name: ", def);
-    
-    if (name === null) {
+    let name = prompt("Enter your name (max 10 characters):", def);
+
+    // User cancelled or entered an empty string
+    if (name === null || name.trim() === "") {
         name = "Player";
     }
+
+    // Enforce maximum length
+    name = name.trim().substring(0, 10);
 
     sessionStorage.setItem("name", name);
 

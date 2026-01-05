@@ -25,28 +25,40 @@ function set_score_text() {
     SPAN.textContent = String(get_score_session());
 }
 
+/**
+ * Builds the highscore table dynamically.
+ * Fills up to 10 rows with player name and score.
+ */
 function set_highscore_list() {
-    const OL = document.querySelector("#highscores ol");
+    const TABLE_BODY = document.querySelector("#highscores-table tbody");
     const HIGHSCORES = get_highscores();
 
-    let elem;
-    let txt;
-    let score;
-
-    OL.innerHTML = ""; // Reset list
+    // Reset table body
+    TABLE_BODY.innerHTML = "";
 
     for (let i = 0; i < 10; i++) {
-        elem = document.createElement("li");
+        const row = document.createElement("tr");
 
-        if (HIGHSCORES.length - 1 >= i) {
-            score = HIGHSCORES[i].name + " : " + HIGHSCORES[i].score;
+        const rankCell = document.createElement("td");
+        const nameCell = document.createElement("td");
+        const scoreCell = document.createElement("td");
+
+        // Rank (always displayed)
+        rankCell.textContent = (i + 1).toString();
+
+        if (HIGHSCORES.length > i) {
+            nameCell.textContent = HIGHSCORES[i].name;
+            scoreCell.textContent = HIGHSCORES[i].score;
         } else {
-            score = "..........";
+            nameCell.textContent = "-";
+            scoreCell.textContent = "-";
         }
 
-        txt = document.createTextNode(score);
-        elem.appendChild(txt);
-        OL.appendChild(elem);
+        row.appendChild(rankCell);
+        row.appendChild(nameCell);
+        row.appendChild(scoreCell);
+
+        TABLE_BODY.appendChild(row);
     }
 }
 
