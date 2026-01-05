@@ -112,7 +112,6 @@ const gamePrototype = {
         if (!params.has("retry") || params.get("retry") !== "true") {
             return;
         }
-        
         change_name();
         this.gameStarted = true;
         this.startDifficultyRamp();
@@ -138,9 +137,8 @@ const gamePrototype = {
                 this.startDifficultyRamp();
                 this.playSfx("backgroundMusic");
             }
-        }
-
-        if (e.code === "ArrowRight") this.rightPressed = true;
+        } 
+        else if (e.code === "ArrowRight") this.rightPressed = true;
         else if (e.code === "ArrowLeft") this.leftPressed = true;
     },
 
