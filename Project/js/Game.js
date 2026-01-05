@@ -129,7 +129,7 @@ const gamePrototype = {
         // Start the game on first left/right arrow press (if not already started).
         if (!this.gameStarted && !this.gameOver) { 
             if (e.code === "Space") {
-                document.location.href = "highscores.html";
+                document.location.href = "./highscores.html";
                 return;
             } else if (e.code === "ArrowLeft" || e.code === "ArrowRight") {
                 change_name();
@@ -581,7 +581,7 @@ const gamePrototype = {
             set_score_session(this.score);
 
             setTimeout(() => {
-                document.location.href = "highscores.html";
+                document.location.href = "./highscores.html";
             }, 2000);
         }
     },

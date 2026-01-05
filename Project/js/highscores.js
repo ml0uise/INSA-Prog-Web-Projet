@@ -1,4 +1,4 @@
-backgroundMusic = new Audio("../assets/sounds/Around-the-Bend.wav");
+backgroundMusic = new Audio("./assets/sounds/Around-the-Bend.wav");
 backgroundMusic.loop = true;
 backgroundMusic.volume = 1;
 

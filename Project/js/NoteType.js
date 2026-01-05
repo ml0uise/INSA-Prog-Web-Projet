@@ -53,7 +53,7 @@ function buildNoteTypes() {
     return [
         makeNoteType({
             name: "A",
-            src: "../assets/images/A.png",
+            src: "./assets/images/A.png",
             weight: 5 / 100,
             score: 100,
             lifeDelta: 0.25,
@@ -65,7 +65,7 @@ function buildNoteTypes() {
         }),
         makeNoteType({
             name: "B",
-            src: "../assets/images/B.png",
+            src: "./assets/images/B.png",
             weight: 10 / 100,
             score: 50,
             lifeDelta: 0,
@@ -76,7 +76,7 @@ function buildNoteTypes() {
         }),
         makeNoteType({
             name: "C",
-            src: "../assets/images/C.png",
+            src: "./assets/images/C.png",
             weight: 15 / 100,
             score: 30,
             lifeDelta: 0,
@@ -87,7 +87,7 @@ function buildNoteTypes() {
         }),
         makeNoteType({
             name: "D",
-            src: "../assets/images/D.png",
+            src: "./assets/images/D.png",
             weight: 15 / 100,
             score: 20,
             lifeDelta: 0,
@@ -98,7 +98,7 @@ function buildNoteTypes() {
         }),
         makeNoteType({
             name: "E",
-            src: "../assets/images/E.png",
+            src: "./assets/images/E.png",
             weight: 15 / 100,
             score: 10,
             lifeDelta: 0,
@@ -109,7 +109,7 @@ function buildNoteTypes() {
         }),
         makeNoteType({
             name: "Fx",
-            src: "../assets/images/Fx.png",
+            src: "./assets/images/Fx.png",
             weight: 25 / 100,
             score: 0,
             lifeDelta: -0.5,
@@ -123,7 +123,7 @@ function buildNoteTypes() {
         }),
         makeNoteType({
             name: "F",
-            src: "../assets/images/F.png",
+            src: "./assets/images/F.png",
             weight: 15 / 100,
             score: 0,
             lifeDelta: -1,

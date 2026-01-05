@@ -11,26 +11,26 @@ const ctx = canvas.getContext("2d");
 
 // Images
 const background = new Image();
-background.src = "../assets/images/amphiteater.jpg";
+background.src = "./assets/images/amphiteater.jpg";
 
 const caracter = new Image();
-caracter.src = "../assets/images/pixel-caracter.png";
+caracter.src = "./assets/images/pixel-caracter.png";
 
 const heartImg = new Image();
-heartImg.src = "../assets/images/heart.png";
+heartImg.src = "./assets/images/heart.png";
 
 const brokenHeartImg = new Image();
-brokenHeartImg.src = "../assets/images/broken-heart.png";
+brokenHeartImg.src = "./assets/images/broken-heart.png";
 
 // Audio
-const backgroundMusic = new Audio("../assets/sounds/Around-the-Bend.wav");
+const backgroundMusic = new Audio("./assets/sounds/Around-the-Bend.wav");
 backgroundMusic.loop = true;
 backgroundMusic.volume = 1;
 
-const goodNoteSoundA = new Audio("../assets/sounds/mixkit-winning-a-coin-video-game-2069.wav");
-const goodNoteSound = new Audio("../assets/sounds/mixkit-game-ball-tap-2073.wav");
-const badNoteSound = new Audio("../assets/sounds/mixkit-game-blood-pop-slide-2363.wav");
-const gameOverSound = new Audio("../assets/sounds/mixkit-player-losing-or-failing-2042.wav");
+const goodNoteSoundA = new Audio("./assets/sounds/mixkit-winning-a-coin-video-game-2069.wav");
+const goodNoteSound = new Audio("./assets/sounds/mixkit-game-ball-tap-2073.wav");
+const badNoteSound = new Audio("./assets/sounds/mixkit-game-blood-pop-slide-2363.wav");
+const gameOverSound = new Audio("./assets/sounds/mixkit-player-losing-or-failing-2042.wav");
 
 goodNoteSoundA.volume = 1;
 goodNoteSound.volume = 1;
