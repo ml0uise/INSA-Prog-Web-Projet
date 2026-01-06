@@ -256,8 +256,7 @@ const gamePrototype = {
                 const bgm = this.sfx.backgroundMusic;
                 if (bgm) {
                     try {
-                        bgm.volume = 0.5;
-                        bgm.play();
+                        bgm.volume = 0.6;
                     } catch (e) {}
                 }
 
