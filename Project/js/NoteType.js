@@ -1,6 +1,4 @@
 /**
- * noteType.js
- * ----------
  * Defines the NoteType "class" and a factory-based registry.
  *
  * A NoteType contains immutable/static data shared by all notes of that type:

@@ -1,5 +1,3 @@
-// game.js
-
 /**
  * Displays the game area and configures canvas visibility
  * based on the number of active players.

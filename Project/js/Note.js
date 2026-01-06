@@ -1,6 +1,4 @@
 /**
- * note.js
- * ------
  * Defines the Note runtime entity (one falling instance) and its prototype methods.
  *
  * Notes reference a NoteType for sprite + gameplay strategy (onCatch).

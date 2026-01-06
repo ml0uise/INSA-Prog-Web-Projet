@@ -1,6 +1,4 @@
 /**
- * Game.js
- * -------
  * Defines the Game object (engine/state owner) and its prototype methods.
  *
  * Game responsibilities:
@@ -241,7 +239,10 @@ const gamePrototype = {
         set_score_session(this.user, this.score);
 
         // Marks game state in storage and retrieves whether the previous state was already "true".
-        let isMyfriendLose = increment_game_state();
+        let gameState = increment_game_state(this.user, this.score);
+        let isMyfriendLose = gameState[0];
+        let myUserFriend = gameState[1];
+        let myUserFriendScore = gameState[2];
 
         // Only one player should execute the delayed navigation in multiplayer.
         if (this.numberOfPlayers === 1 || isMyfriendLose) {
@@ -260,8 +261,13 @@ const gamePrototype = {
                     } catch (e) {}
                 }
 
+                // Winner alert
+                if (numberOfPlayers === 2) {
+                    twoPlayersWinnerAlert(this.user, this.score, myUserFriend, myUserFriendScore);
+                }
+
                 // Navigates to the highscores view and optionally updates persistence.
-                viewHighscores(this.numberOfPlayers, update);
+                viewHighscores(numberOfPlayers, update, true, this.user, this.score, myUserFriend, myUserFriendScore);
             }, 2000);
         }
     },
