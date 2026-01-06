@@ -1,13 +1,27 @@
+/* game.css */
+
+/* 
+ * Applies a global CSS reset to remove default browser spacing.
+ * This ensures consistent layout rendering across browsers.
+ */
 * {
     padding: 0;
     margin: 0;
 }
 
+/*
+ * Forces the root and body elements to occupy the full viewport.
+ * This is required for reliable vertical centering and background sizing.
+ */
 html, body {
     height: 100%;
     width: 100%;
 }
 
+/*
+ * Defines the page background styling.
+ * The image is fixed to the viewport and scaled to fully cover the screen.
+ */
 body {
     background-image: url("../assets/images/background.jpg");
     background-repeat: no-repeat;
@@ -15,6 +29,10 @@ body {
     background-size: cover;
 }
 
+/*
+ * Provides a reusable flex-centering utility.
+ * It horizontally and vertically centers children and ensures full-width layout.
+ */
 .center {
     display: -webkit-box;
     display: -ms-flexbox;
@@ -27,6 +45,10 @@ body {
     width: 100%;
 }
 
+/*
+ * Styles the main game title with a retro arcade font and a neon red glow.
+ * The stroke and layered shadows improve readability on busy backgrounds.
+ */
 #game-title {
     font-family: 'Press Start 2P', cursive;
     font-size: 2.2rem;
@@ -48,6 +70,10 @@ body {
         0 0 8vh   #b00000;
 }
 
+/*
+ * Styles the game canvas area.
+ * The canvas is sized responsively with a neon border and glow effect.
+ */
 canvas {
     background: black;
 
@@ -68,12 +94,20 @@ canvas {
         0 0 4.8vh #00e1ff;
 }
 
+/*
+ * Defines the layout box for the score display area.
+ * Vertical margins create separation from the canvas and other UI elements.
+ */
 #score {
     height: 8vh;
     margin-top: 2vh;
     margin-bottom: 3vh;
 }
 
+/*
+ * Styles the score value with a yellow neon theme and a blinking animation.
+ * The semi-transparent background improves contrast against the page background.
+ */
 #score-value {
     display: inline-block;
     width: fit-content;
@@ -102,6 +136,10 @@ canvas {
         0 0 0.6vh  #ffea00;
 }
 
+/*
+ * Defines the blinking pattern used by the score indicator.
+ * Opacity and glow are modulated to simulate an arcade-style neon flicker.
+ */
 @keyframes scoreBlink {
     0%, 45%, 100% {
         opacity: 1;
@@ -124,6 +162,10 @@ canvas {
     }
 }
 
+/*
+ * Styles the highscores container.
+ * It uses a column layout and a cyan neon glow theme matching the HUD.
+ */
 #highscores {
     flex-direction: column;
 
@@ -143,6 +185,10 @@ canvas {
         0 0 8vh   #00e1ff;
 }
 
+/*
+ * Styles the highscores title banner.
+ * A white outline and cyan stroke provide strong contrast and hierarchy.
+ */
 #highscores-title {
     margin-bottom: 3vh;
     color: #ffffff;
@@ -154,6 +200,10 @@ canvas {
     border: 0.12em solid #ffffff;
 }
 
+/*
+ * Configures the highscores table for fixed layout.
+ * This prevents column width shifts when content lengths vary.
+ */
 #highscores-table {
     max-width: 100vw;
 
@@ -163,6 +213,10 @@ canvas {
     table-layout: fixed;
 }
 
+/*
+ * Defines consistent cell sizing and alignment.
+ * No wrapping is allowed to preserve the pixel-art aesthetic and row height.
+ */
 #highscores-table th,
 #highscores-table td {
     padding: 1.2vh 1vw;
@@ -170,16 +224,27 @@ canvas {
     white-space: nowrap;
 }
 
+/*
+ * Enforces a consistent row height within the scrollable body.
+ */
 #highscores-table tbody tr {
     height: 3.2vh;
 }
 
+/*
+ * Makes the table body scrollable while keeping the header fixed.
+ * The body is displayed as a block to enable overflow scrolling.
+ */
 #highscores-table tbody {
     display: block;
     max-height: 30vh;
     overflow-y: auto;
 }
 
+/*
+ * Ensures header and body rows share the same column widths.
+ * Displaying rows as tables with fixed layout maintains alignment.
+ */
 #highscores-table thead,
 #highscores-table tbody tr {
     display: table;
@@ -187,10 +252,17 @@ canvas {
     table-layout: fixed;
 }
 
+/*
+ * Applies a white color to the table header to emphasize column labels.
+ */
 #highscores-table thead {
     color: #ffffff;
 }
 
+/*
+ * Styles the retry button with a neon blue theme and pulsing animation.
+ * The large dimensions make it accessible and visually prominent.
+ */
 #retry {
     border-radius: 2vh;
     width: 18vw;
@@ -200,7 +272,6 @@ canvas {
     cursor: pointer;
 
     background-color: #00f;
-
 
     box-shadow:
         0 0 0.6vh rgba(0, 0, 255, 0.7),
@@ -212,6 +283,10 @@ canvas {
     transition: transform 0.15s ease;
 }
 
+/*
+ * Defines the pulsing pattern for the retry button.
+ * It alternates brightness and opacity to simulate a neon flicker.
+ */
 @keyframes retryPulse {
     0%, 55% {
         opacity: 1;
@@ -231,6 +306,10 @@ canvas {
     }
 }
 
+/*
+ * Provides a quick "press" feedback on hover.
+ * The translation simulates a physical button being pushed.
+ */
 #retry:hover {
     transition-duration: 10ms;
     transition-property: transform;
@@ -238,6 +317,10 @@ canvas {
     transform: translate(0.5vh, 0.5vh);
 }
 
+/*
+ * Reinforces the pressed state on click/tap.
+ * The same translation is applied for consistent interaction feedback.
+ */
 #retry:active {
   transform: translateX(0.5vh, 0.5vh);
 }

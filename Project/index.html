@@ -1,28 +1,88 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <!-- 
+            Defines the document character encoding.
+            UTF-8 is used to ensure proper rendering of special characters.
+        -->
         <meta charset="utf-8" />
+
+        <!-- 
+            Sets the page title displayed in the browser tab.
+            This title reflects the game theme and is also used by search engines.
+        -->
         <title>INSA’s Grade Rain of Death</title>
+
+        <!-- 
+            Defines the favicon displayed in the browser tab.
+            A pixel-art character is used to match the game’s visual identity.
+        -->
         <link rel="icon" type="image/x-icon" href="./assets/images/pixel-caracter.png">
+
+        <!-- 
+            Loads the main stylesheet containing all layout, animation,
+            and visual effects for the game and UI.
+        -->
         <link rel="stylesheet" href="./css/game.css">
+
+        <!-- 
+            Loads the retro arcade font used consistently across the UI.
+            This font reinforces the pixel-art / old-school game aesthetic.
+        -->
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
     </head>
+
     <body>
+        <!-- 
+            Game title container.
+            Uses flex centering to horizontally align the main title.
+        -->
         <div class="center" id="title">
             <h1 id="game-title">INSA’s Grade Rain of Death</h1>
         </div>
 
+        <!-- 
+            Main game container.
+            Holds one or two canvas elements depending on multiplayer mode.
+        -->
         <div class="center" id="game">
+            <!-- 
+                Primary canvas for Player 1.
+                Initially hidden and shown dynamically by JavaScript.
+            -->
             <canvas id="myCanvas1" width="1000" height="800" style="display: none;"></canvas>
+
+            <!-- 
+                Secondary canvas for Player 2.
+                Only displayed when two-player mode is enabled.
+            -->
             <canvas id="myCanvas2" width="900" height="800" style="display: none;"></canvas>
         </div>
 
+        <!-- 
+            Score display container.
+            Visibility is controlled by JavaScript depending on the current view.
+        -->
         <div class="center" id="score" style="display: none;">
+            <!-- 
+                Displays the current score value.
+                The span content is updated dynamically at runtime.
+            -->
             <div id="score-value">Score:&nbsp;<span>0</span></div>
         </div>
 
+        <!-- 
+            Highscores screen container.
+            Shown when the player navigates to the highscores view.
+        -->
         <div class="center" id="highscores" style="display: none;">
+            <!-- Highscores section title -->
             <h2 id="highscores-title">High Scores</h2>
+
+            <!-- 
+                Highscores table.
+                Rows are generated dynamically via JavaScript.
+            -->
             <table id="highscores-table">
                 <thead>
                     <tr>
@@ -32,15 +92,36 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Filled by JavaScript -->
+                    <!-- 
+                        Table body is intentionally empty.
+                        It is populated at runtime by highscores.js.
+                    -->
                 </tbody>
             </table>
         </div>
 
+        <!-- 
+            Action button container.
+            Holds the retry button used to start or restart the game.
+        -->
         <div class="center" id="button" style="display: none;">
+            <!-- 
+                Retry button represented as an image.
+                Click handling is managed in main.js.
+            -->
             <img id="retry" src="./assets/images/retry.png" alt="Retry" />
         </div>
 
+        <!-- 
+            JavaScript dependency loading order is intentional:
+            - cookies.js: session storage, player names, highscores persistence
+            - NoteType.js: note behavior strategies
+            - Note.js: falling note entity definition
+            - Game.js: core game engine and loop
+            - game.js: game initialization and asset binding
+            - highscores.js: highscores rendering logic
+            - main.js: global control flow, input routing, and UI transitions
+        -->
         <script src="./js/cookies.js"></script>
         <script src="./js/NoteType.js"></script>
         <script src="./js/Note.js"></script>
