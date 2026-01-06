@@ -1,27 +1,52 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8" />
-  <title>INSA’s Grade Rain of Death</title>
-    <link rel="icon" type="image/x-icon" href="./assets/images/pixel-caracter.png">
-  <link rel="stylesheet" href="./css/game.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
-</head>
-<body>
-  <div class="center" id="title">
-    <h1 id="game-title">INSA’s Grade Rain of Death</h1>
-  </div>
+    <head>
+        <meta charset="utf-8" />
+        <title>INSA’s Grade Rain of Death</title>
+        <link rel="icon" type="image/x-icon" href="./assets/images/pixel-caracter.png">
+        <link rel="stylesheet" href="./css/game.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+    </head>
+    <body>
+        <div class="center" id="title">
+            <h1 id="game-title">INSA’s Grade Rain of Death</h1>
+        </div>
 
-  <!-- Canvas element to draw game animations -->
-  <div class="center" id="game">
-    <canvas id="myCanvas" width="1000" height="800"></canvas>
-  </div>
+        <div class="center" id="game">
+            <canvas id="myCanvas1" width="1000" height="800" style="display: none;"></canvas>
+            <canvas id="myCanvas2" width="900" height="800" style="display: none;"></canvas>
+        </div>
 
-  <script src="./js/cookies.js"></script>
-  <script src="./js/NoteType.js"></script>
-  <script src="./js/Note.js"></script>
-  <script src="./js/Game.js"></script>
-  <script src="./js/game.js"></script>
+        <div class="center" id="score" style="display: none;">
+            <div id="score-value">Score:&nbsp;<span>0</span></div>
+        </div>
 
-</body>
+        <div class="center" id="highscores" style="display: none;">
+            <h2 id="highscores-title">High Scores</h2>
+            <table id="highscores-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Player</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Filled by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="center" id="button" style="display: none;">
+            <img id="retry" src="./assets/images/retry.png" alt="Retry" />
+        </div>
+
+        <script src="./js/cookies.js"></script>
+        <script src="./js/NoteType.js"></script>
+        <script src="./js/Note.js"></script>
+        <script src="./js/Game.js"></script>
+        <script src="./js/game.js"></script>
+        <script src="./js/highscores.js"></script>
+        <script src="./js/main.js"></script>
+    </body>
 </html>

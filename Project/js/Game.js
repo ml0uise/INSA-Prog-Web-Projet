@@ -21,6 +21,12 @@ function Game(opts) {
     this.canvas = opts.canvas;
     this.ctx = opts.ctx;
 
+    this.numberOfPlayers = opts.numberOfPlayers;
+    this.user = opts.user;
+    this.username = this.user.toUpperCase();
+    this.arrowLeft = opts.arrowLeft;
+    this.arrowRight = opts.arrowRight;
+
     // Images
     this.background = opts.background;
     this.caracter = opts.caracter;
@@ -41,8 +47,10 @@ function Game(opts) {
     this.lives = 3; // supports halves (e.g., 2.5)
 
     this.gameStarted = false;
-    this.gameOver = false;
+    this.previewed = false;
+    this.isGameOver = false;
     this.gameOverAlreadyHandled = false;
+    this.dead = false;
 
     // Input state
     this.rightPressed = false;
@@ -84,10 +92,14 @@ const gamePrototype = {
 
     /**
      * Attaches keyboard listeners for player controls and "press to start".
+     * Idempotent: calling multiple times will not attach duplicates.
      */
     attachInput() {
+        if (this.inputAttached) return;
+
         document.addEventListener("keydown", this.keyDownHandler, false);
         document.addEventListener("keyup", this.keyUpHandler, false);
+        this.inputAttached = true;
     },
 
     /**
@@ -102,22 +114,117 @@ const gamePrototype = {
     },
 
     /**
-     * Auto-starts the game when returning from a "retry" flow.
-     * Expects the URL to contain ?retry=true
+     * Stops periodic difficulty increase (idempotent).
      */
-    tryAutoStartFromURL() {
-        const params = new URLSearchParams(window.location.search);
+    stopDifficultyRamp() {
+        if (this.difficultyIntervalId === null) return;
 
-        // Validation: ensure "retry" exists and is explicitly set to "true"
-        if (!params.has("retry") || params.get("retry") !== "true") {
-            return;
-        }
-        change_name();
-        this.gameStarted = true;
-        this.startDifficultyRamp();
-        this.playSfx("backgroundMusic");
+        clearInterval(this.difficultyIntervalId);
+        this.difficultyIntervalId = null;
     },
 
+    /**
+     * Start a run.
+     */
+    start(preview) {
+        release_game_state();
+        if (!this.previewed) {
+            this.attachInput();
+            this.loop();
+            this.previewed = true;
+        }
+        if (!preview) {
+            this.username = get_name(this.user).toUpperCase();
+            this.gameStarted = true;
+            this.startDifficultyRamp();
+            this.playSfx("backgroundMusic");
+        }
+    },
+
+    /**
+     * Restarts a new run from a pristine state and relaunches the main loop.
+     * This does not recreate assets; it reuses the existing canvas/images/audio.
+     */
+    restart() {
+        release_game_state();
+
+        // Ensure we are in a clean initial state.
+        this.resetStateToDefaults();
+
+        // Start the game
+        this.gameStarted = true;
+        this.startDifficultyRamp();
+        
+        // Increase background music volume.
+        const bgm = this.sfx?.backgroundMusic;
+        if (bgm) {
+            try {
+                bgm.volume = 1;
+            } catch (e) {}
+        }
+    },
+
+    /**
+     * Resets runtime state to initial defaults (no timers, no rendering, no loop control).
+     */
+    resetStateToDefaults() {
+        // Gameplay state
+        this.score = 0;
+        this.lives = 3;
+
+        this.username = get_name(this.user).toLocaleUpperCase();
+
+        this.gameStarted = false;
+        this.isGameOver = false;
+        this.gameOverAlreadyHandled = false;
+        this.dead = false;
+
+        // Input state
+        this.rightPressed = false;
+        this.leftPressed = false;
+
+        // Difficulty ramp
+        this.difficultyLevel = 1;
+        this.difficultyIntervalId = null;
+
+        // Timers / UI effects
+        this.startPromptBlinkStart = performance.now();
+        this.livesLostAnimStart = null;
+        this.blinkStart = performance.now();
+
+        // Entities
+        this.notes = [];
+
+        // Player position
+        this.caracterX = (this.canvas.width - this.caracterWidth) / 2;
+    },
+
+    gameOver(update) {
+        if (this.dead === true) return;
+        this.dead = true;
+        
+        // Set score to the session with cookie.js function
+        set_score_session(this.user, this.score);
+
+        let isMyfriendLose = increment_game_state();
+
+        if (this.numberOfPlayers === 1 || isMyfriendLose) {
+
+            setTimeout(() => {                
+                // Stop difficulty ramp (otherwise it keeps mutating difficultyLevel).
+                this.stopDifficultyRamp();
+
+                const bgm = this.sfx.backgroundMusic;
+                if (bgm) {
+                    try {
+                        bgm.volume = 0.5;
+                        bgm.play();
+                    } catch (e) {}
+                }
+                viewHighscores(this.numberOfPlayers, update);
+            }, 2000);
+        }
+    },
 
     /* =========================
        Input handling
@@ -125,26 +232,21 @@ const gamePrototype = {
 
 
     keyDownHandler(e) {
-        // If the game has not started yet, allow SPACE to open highscores.
-        // Start the game on first left/right arrow press (if not already started).
-        if (!this.gameStarted && !this.gameOver) { 
-            if (e.code === "Space") {
-                document.location.href = "./highscores.html";
-                return;
-            } else if (e.code === "ArrowLeft" || e.code === "ArrowRight") {
-                change_name();
-                this.gameStarted = true;
-                this.startDifficultyRamp();
-                this.playSfx("backgroundMusic");
-            }
-        } 
-        else if (e.code === "ArrowRight") this.rightPressed = true;
-        else if (e.code === "ArrowLeft") this.leftPressed = true;
+        if (e.code === this.arrowRight) {
+            this.rightPressed = true;
+        }
+        else if (e.code === this.arrowLeft) {
+            this.leftPressed = true;
+        }
     },
 
     keyUpHandler(e) {
-        if (e.code === "ArrowRight") this.rightPressed = false;
-        else if (e.code === "ArrowLeft") this.leftPressed = false;
+        if (e.code === this.arrowRight) {
+            this.rightPressed = false;
+        }
+        else if (e.code === this.arrowLeft) {
+            this.leftPressed = false;
+        }
     },
 
     /* =========================
@@ -210,14 +312,13 @@ const gamePrototype = {
         if (this.lives > 0) return;
 
         this.lives = 0;
-        this.gameOver = true;
+        this.isGameOver = true;
 
         // Stop background music before playing the game over SFX.
         const bgm = this.sfx.backgroundMusic;
         if (bgm) {
             try {
-                bgm.pause();
-                bgm.currentTime = 0;
+                bgm.volume = 0.2;
             } catch (e) {}
         }
 
@@ -262,9 +363,9 @@ const gamePrototype = {
      * Updates player horizontal movement based on current input.
      */
     updatePlayer() {
-        if (this.gameOver) return;
+        if (this.isGameOver) return;
 
-        const step = 10 + (this.difficultyLevel / 5);
+        const step = 10;
 
         if (this.rightPressed && this.caracterX < this.canvas.width - this.caracterWidth) {
             this.caracterX += step;
@@ -305,7 +406,7 @@ const gamePrototype = {
                 continue;
             }
 
-            if (this.gameOver) continue;
+            if (this.isGameOver) continue;
 
             if (n.collidesWithRect(paddleX, paddleY, paddleW, paddleH)) {
                 this.applyCollisionEffects(n);
@@ -349,14 +450,14 @@ const gamePrototype = {
         // Neon glow layers for readability over the background.
         this.ctx.shadowColor = "#00faff";
         this.ctx.shadowBlur = 8;
-        this.ctx.fillText("SCORE: " + this.score, 20, 40);
+        this.ctx.fillText(`${this.username}: ` + this.score, 20, 40);
 
         this.ctx.shadowColor = "#00e1ff";
         this.ctx.shadowBlur = 20;
-        this.ctx.fillText("SCORE: " + this.score, 20, 40);
+        this.ctx.fillText(`${this.username}: ` + this.score, 20, 40);
 
         this.ctx.shadowBlur = 40;
-        this.ctx.fillText("SCORE: " + this.score, 20, 40);
+        this.ctx.fillText(`${this.username}: ` + this.score, 20, 40);
 
         this.ctx.restore();
     },
@@ -452,14 +553,14 @@ const gamePrototype = {
         MAIN START MESSAGE
         ========================= */
 
-        this.ctx.font = "bold 36px 'Press Start 2P', cursive";
+        this.ctx.font = "bold 1.8rem 'Press Start 2P', cursive";
         this.ctx.fillStyle = "#00faff";
 
         // Line 1
         this.ctx.shadowColor = "#00faff";
         this.ctx.shadowBlur = 10;
         this.ctx.fillText(
-            "PRESS LEFT/RIGHT ARROW",
+            "PRESS ENTER TO START",
             this.canvas.width / 2,
             this.canvas.height / 2 - 70
         );
@@ -467,23 +568,25 @@ const gamePrototype = {
         this.ctx.shadowColor = "#00e1ff";
         this.ctx.shadowBlur = 25;
         this.ctx.fillText(
-            "PRESS LEFT/RIGHT ARROW",
+            "PRESS ENTER TO START",
             this.canvas.width / 2,
             this.canvas.height / 2 - 70
         );
 
         this.ctx.shadowBlur = 50;
         this.ctx.fillText(
-            "PRESS LEFT/RIGHT ARROW",
+            "PRESS ENTER TO START",
             this.canvas.width / 2,
             this.canvas.height / 2 - 70
         );
+
+        this.ctx.globalAlpha = 0.9;
 
         // Line 2
         this.ctx.shadowColor = "#00faff";
         this.ctx.shadowBlur = 10;
         this.ctx.fillText(
-            "TO START",
+            "←/→ (Q/D) TO MOVE RIGHT/LEFT",
             this.canvas.width / 2,
             this.canvas.height / 2 - 10
         );
@@ -491,14 +594,14 @@ const gamePrototype = {
         this.ctx.shadowColor = "#00e1ff";
         this.ctx.shadowBlur = 25;
         this.ctx.fillText(
-            "TO START",
+            "←/→ (Q/D) TO MOVE RIGHT/LEFT",
             this.canvas.width / 2,
             this.canvas.height / 2 - 10
         );
 
         this.ctx.shadowBlur = 50;
         this.ctx.fillText(
-            "TO START",
+            "←/→ (Q/D) TO MOVE RIGHT/LEFT",
             this.canvas.width / 2,
             this.canvas.height / 2 - 10
         );
@@ -507,12 +610,12 @@ const gamePrototype = {
         SECONDARY ACTION
         ========================= */
 
-        this.ctx.font = "bold 22px 'Press Start 2P', cursive";
+        this.ctx.font = "bold 1rem 'Press Start 2P', cursive";
 
         this.ctx.shadowColor = "#00faff";
         this.ctx.shadowBlur = 10;
         this.ctx.fillText(
-            "OR PRESS SPACE FOR HIGHSCORES",
+            "SPACE FOR HIGHSCORES - P TO ADD/REMOVE A PLAYER",
             this.canvas.width / 2,
             this.canvas.height / 2 + 50
         );
@@ -520,7 +623,7 @@ const gamePrototype = {
         this.ctx.shadowColor = "#00e1ff";
         this.ctx.shadowBlur = 25;
         this.ctx.fillText(
-            "OR PRESS SPACE FOR HIGHSCORES",
+            "SPACE FOR HIGHSCORES - P TO ADD/REMOVE A PLAYER",
             this.canvas.width / 2,
             this.canvas.height / 2 + 50
         );
@@ -532,7 +635,7 @@ const gamePrototype = {
         // Disable blinking for the audio hint to keep it readable.
         this.ctx.globalAlpha = 0.9;
 
-        this.ctx.font = "bold 18px 'Press Start 2P', cursive";
+        this.ctx.font = "bold 1rem 'Press Start 2P', cursive";
         this.ctx.fillStyle = "#ffffff";
         this.ctx.shadowColor = "#ffffff";
         this.ctx.shadowBlur = 6;
@@ -573,16 +676,9 @@ const gamePrototype = {
 
         this.ctx.restore();
 
-        // One-shot side effects: save score and redirect.
         if (!this.gameOverAlreadyHandled) {
             this.gameOverAlreadyHandled = true;
-
-            // Set score to the session with cookie.js function
-            set_score_session(this.score);
-
-            setTimeout(() => {
-                document.location.href = "./highscores.html";
-            }, 2000);
+            this.gameOver(true);
         }
     },
 
@@ -600,14 +696,14 @@ const gamePrototype = {
         this.drawBackground();
 
         // Start screen: render prompt and pause gameplay logic.
-        if (!this.gameStarted && !this.gameOver) {
+        if (!this.gameStarted && !this.isGameOver) {
             this.drawPressToStart();
             requestAnimationFrame(this.loop);
             return;
         }
 
         // Spawn notes only while the game is running.
-        if (!this.gameOver && Math.random() < 0.03 + (this.difficultyLevel / 300)) {
+        if (!this.isGameOver && Math.random() < 0.03 + (this.difficultyLevel / 300)) {
             this.spawnNote();
         }
 
@@ -622,11 +718,11 @@ const gamePrototype = {
         this.drawLives();
 
         // Overlay game over (and one-shot side effects).
-        if (this.gameOver) {
+        if (this.isGameOver) {
             this.drawGameOver();
         }
 
-        requestAnimationFrame(this.loop);
+        requestAnimationFrame(this.loop);    
     }
 };
 

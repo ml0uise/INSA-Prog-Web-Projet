@@ -1,10 +1,24 @@
-backgroundMusic = new Audio("./assets/sounds/Around-the-Bend.wav");
-backgroundMusic.loop = true;
-backgroundMusic.volume = 1;
+function showHighScores() {
+    const score = document.getElementById("score");
+    const highScores = document.getElementById("highscores");
+    const button = document.getElementById("button");
 
-backgroundMusic.play().catch(() => {});
+    score.style.display = "flex";
+    highScores.style.display = "flex";
+    button.style.display = "flex";
+}
 
-function will_change_highscores() {
+function hideHighScores() {
+    const score = document.getElementById("score");
+    const highScores = document.getElementById("highscores");
+    const button = document.getElementById("button");
+
+    score.style.display = "none";
+    highScores.style.display = "none";
+    button.style.display = "none";
+}
+
+function will_change_highscores(numberOfPlayers) {
     const highscores = get_highscores();
 
     if (highscores.length === 0) {
@@ -13,23 +27,34 @@ function will_change_highscores() {
 
     let min_score = parseInt(highscores.slice(-1)[0].score);
 
-    if (min_score <= get_score_session()) {
-        return true;
-    } else {
-        return false;
+    for (let i = 1; i <= numberOfPlayers; i++) {
+        if (min_score <= get_score_session(`Player ${i}`)) {
+            return true;
+        } else {
+            return false;
+        }
     }
+
 }
 
-function set_score_text() {
+function set_score_text(numberOfPlayers) {
     const SPAN = document.querySelector("#score span");
-    SPAN.textContent = String(get_score_session());
+    let max_score = 0;
+    let user_score = 0;
+    for (let i = 1; i <= numberOfPlayers; i++) {
+        user_score = get_score_session(`Player ${i}`);
+        if (user_score > max_score) {
+            max_score = user_score;
+        }
+    }
+    SPAN.textContent = String(max_score);
 }
 
 /**
  * Builds the highscore table dynamically.
  * Fills up to 10 rows with player name and score.
  */
-function set_highscore_list() {
+function set_highscore_table() {
     const TABLE_BODY = document.querySelector("#highscores-table tbody");
     const HIGHSCORES = get_highscores();
 
@@ -62,13 +87,15 @@ function set_highscore_list() {
     }
 }
 
-function on_load() {
-    if (will_change_highscores()) {
-        update_highscores(get_score_session());
+function printHighScores(numberOfPlayers, update) {
+    if (update) {
+        if (will_change_highscores(numberOfPlayers)) {
+            for (let i = 1; i <= numberOfPlayers; i++) {
+                update_highscores(`Player ${i}`,get_score_session(`Player ${i}`));
+            }
+        }
     }
 
-    set_score_text();
-    set_highscore_list();
-
-    add_blink_hover_listener();
+    set_score_text(numberOfPlayers);
+    set_highscore_table();
 }

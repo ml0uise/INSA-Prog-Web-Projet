@@ -38,7 +38,7 @@ document.cookie = "easter_egg=\"Thanks for inviting this cookie in your session\
 
 
 
-const HIGHSCORE_LIMIT = 8;  // Number of highscores to keep
+const HIGHSCORE_LIMIT = 10;  // Number of highscores to keep
 
 
 class Player {
@@ -49,8 +49,8 @@ class Player {
 }
 
 
-function get_score_session() {
-    let score = sessionStorage.getItem("score");
+function get_score_session(user) {
+    let score = sessionStorage.getItem(`${user} score`);
 
     if (score === null) {
         return -42
@@ -59,45 +59,50 @@ function get_score_session() {
     }
 }
 
-function set_score_session(score) {
-    sessionStorage.setItem("score", String(score));
+function set_score_session(user, score) {
+    sessionStorage.setItem(`${user} score`, String(score));
 }
 
 
 
-function get_name() {
-    let name = sessionStorage.getItem("name");
+function get_name(user) {
+    let name = sessionStorage.getItem(user);
 
     if (name === null) {
-        return change_name();
+        return change_name(user);
     } else {
         return name;
     }
 }
 
-function change_name() {
-    let old_name = sessionStorage.getItem("name");
+function change_name(user) {
+    let old_name = sessionStorage.getItem(user);
     let def;
 
     if (old_name === null) {
-        def = "Player";
+        def = user;
     } else {
         def = old_name;
     }
 
-    let name = prompt("Enter your name (max 10 characters):", def);
+    let name = prompt(`${user}, enter your username (max 12 characters):`, def);
 
     // User cancelled or entered an empty string
     if (name === null || name.trim() === "") {
-        name = "Player";
+        name = user;
     }
 
     // Enforce maximum length
-    name = name.trim().substring(0, 10);
+    name = name.trim().substring(0, 12);
 
-    sessionStorage.setItem("name", name);
+    sessionStorage.setItem(user, name);
 
     return name;
+}
+
+function erase_player2() {
+    sessionStorage.removeItem("Player 2");
+    sessionStorage.removeItem("Player 2 score");
 }
 
 
@@ -115,9 +120,9 @@ function get_highscores() {
     }
 }
 
-function update_highscores(score) {
+function update_highscores(user, score) {
     let actual = get_highscores();
-    let player = new Player(get_name(), score);
+    let player = new Player(get_name(user), score);
 
     // Insert new highscore
     actual.push(player);
@@ -126,4 +131,18 @@ function update_highscores(score) {
     actual.slice(HIGHSCORE_LIMIT);  // Only keep a few highscores
     
     sessionStorage.setItem("highscores", JSON.stringify(actual));
+}
+
+
+function increment_game_state() {
+    let gameState = sessionStorage.getItem("game_state");
+    sessionStorage.setItem("game_state", "true");
+
+    if (gameState === "true") return true;
+    else if (gameState === "false") return false;
+
+}
+
+function release_game_state() {
+    sessionStorage.setItem("game_state", "false");
 }
