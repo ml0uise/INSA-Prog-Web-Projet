@@ -1,5 +1,3 @@
-/* game.css */
-
 /* 
  * Applies a global CSS reset to remove default browser spacing.
  * This ensures consistent layout rendering across browsers.
@@ -54,20 +52,11 @@ body {
     font-size: 2.2rem;
     text-transform: uppercase;
 
-    margin-top: 5vh;
-
-    height: 10vh;
+    margin: 4vh 1vw;
 
     color: #ffffff;
 
-    -webkit-text-stroke: 0.2vh #ff1a1a;
-
-    text-shadow:
-        0 0 0.4vh #ff1a1a,
-        0 0 1vh   #ff1a1a,
-        0 0 2vh   #ff1a1a,
-        0 0 4vh   #ff0000,
-        0 0 8vh   #b00000;
+    -webkit-text-stroke: 0.2vh #b00000;
 }
 
 /*
@@ -92,6 +81,38 @@ canvas {
         0 0 1.4vh #00faff,
         0 0 2.8vh #00e1ff,
         0 0 4.8vh #00e1ff;
+
+    cursor: pointer;
+
+    animation: canvasBlink 1s infinite;
+    
+    transition: transform 0.15s ease;
+}
+
+@keyframes canvasBlink {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    10%, 90% {
+        opacity: 0.98;
+    }
+
+    20%, 80% {
+        opacity: 0.96;
+    }
+
+    30%, 70% {
+        opacity: 0.94;
+    }
+
+    40%, 60% {
+        opacity: 0.92;
+    }
+
+    50% {
+        opacity: 0.90;
+    }
 }
 
 /*
@@ -99,9 +120,8 @@ canvas {
  * Vertical margins create separation from the canvas and other UI elements.
  */
 #score {
-    height: 8vh;
-    margin-top: 2vh;
-    margin-bottom: 3vh;
+    margin-top: 3vh;
+    margin-bottom: 6vh;
 }
 
 /*
@@ -169,27 +189,48 @@ canvas {
 #highscores {
     flex-direction: column;
 
-    height: 50vh;
-    margin-bottom: 2vh;
+    margin-bottom: 4vh;
 
     font-family: 'Press Start 2P', cursive;
-    font-size: 2rem;
+    font-size: 1.5rem;
     line-height: 2rem;
     text-transform: uppercase;
 
     text-shadow:
-        0 0 0.4vh #00faff,
-        0 0 1vh   #00faff,
-        0 0 2vh   #00faff,
-        0 0 4vh   #00e1ff,
-        0 0 8vh   #00e1ff;
+        0 0 0.2vh #00faff,
+        0 0 0.6vh   #00e1ff;
 }
 
+#majored {
+    animation: majoredBlink 1.5s infinite;
+
+    color: #fff700;
+    
+    text-shadow:
+        0 0 0.2vh  #fff700,
+        0 0 0.6vh  #ffea00;
+}
+
+@keyframes majoredBlink {
+    0%, 45%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.35;
+    }
+
+    55% {
+        opacity: 1;
+    }
+}
 /*
  * Styles the highscores title banner.
  * A white outline and cyan stroke provide strong contrast and hierarchy.
  */
 #highscores-title {
+    font-size: 2.5rem;
+    margin-top: 1vh;
     margin-bottom: 3vh;
     color: #ffffff;
 
@@ -197,7 +238,15 @@ canvas {
 
     padding: 2vh 1.2vw;
     border-radius: 1vh;
-    border: 0.12em solid #ffffff;
+    border: 0.12em solid white;
+
+    background-color: rgb(255, 255, 255, 0.25);
+
+    box-shadow:
+        0 0 0.6vh #00faff,
+        0 0 1.4vh #00faff,
+        0 0 2.8vh #00e1ff,
+        0 0 4.8vh #00e1ff;
 }
 
 /*
@@ -225,13 +274,6 @@ canvas {
 }
 
 /*
- * Enforces a consistent row height within the scrollable body.
- */
-#highscores-table tbody tr {
-    height: 3.2vh;
-}
-
-/*
  * Makes the table body scrollable while keeping the header fixed.
  * The body is displayed as a block to enable overflow scrolling.
  */
@@ -239,6 +281,13 @@ canvas {
     display: block;
     max-height: 30vh;
     overflow-y: auto;
+
+    text-shadow:
+        0 0 0.4vh #00faff,
+        0 0 1vh   #00faff,
+        0 0 2vh   #00faff,
+        0 0 4vh   #00e1ff,
+        0 0 8vh   #00e1ff;
 }
 
 /*
@@ -257,6 +306,8 @@ canvas {
  */
 #highscores-table thead {
     color: #ffffff;
+    
+    -webkit-text-stroke: 0.1vh #00faff;
 }
 
 /*
@@ -265,8 +316,8 @@ canvas {
  */
 #retry {
     border-radius: 2vh;
-    width: 18vw;
-    height: 15vh;
+    width: 15vw;
+    height: 10vh;
     padding: 1vh;
 
     cursor: pointer;
@@ -310,7 +361,7 @@ canvas {
  * Provides a quick "press" feedback on hover.
  * The translation simulates a physical button being pushed.
  */
-#retry:hover {
+#retry:hover, .menu-button:hover, canvas:hover {
     transition-duration: 10ms;
     transition-property: transform;
 
@@ -321,6 +372,47 @@ canvas {
  * Reinforces the pressed state on click/tap.
  * The same translation is applied for consistent interaction feedback.
  */
-#retry:active {
+#retry:active, .menu-button:active, canvas:active {
   transform: translateX(0.5vh, 0.5vh);
+}
+
+canvas.no-hover-no-active {
+    transform: none;
+    cursor: none;
+}
+
+.menu-button {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.5rem;
+    line-height: 3rem;
+    text-transform: uppercase;
+
+    margin: 2vh 2vw;
+
+    cursor: pointer;
+
+    background-color: rgb(0, 0, 0, 0.6);
+
+    box-shadow:
+        0 0 0.6vh #00faff,
+        0 0 1.4vh #00faff,
+        0 0 2.8vh #00e1ff,
+        0 0 4.8vh #00e1ff;
+
+    text-shadow:
+        0 0 0.2vh #00faff,
+        0 0 0.6vh   #00e1ff;
+
+    margin-bottom: 3vh;
+    color: #ffffff;
+
+    -webkit-text-stroke: 0.1vh #00faff;
+
+    padding: 2vh 1.2vw;
+    border-radius: 2vh;
+    border: 0.12em solid #00faff;
+
+    animation: retryPulse 3.2s infinite;
+
+    transition: transform 0.15s ease;
 }

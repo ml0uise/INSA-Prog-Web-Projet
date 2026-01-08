@@ -50,13 +50,13 @@
                 Primary canvas for Player 1.
                 Initially hidden and shown dynamically by JavaScript.
             -->
-            <canvas id="myCanvas1" width="1000" height="800" style="display: none;"></canvas>
+            <canvas id="myCanvas1" width="1000" height="600" style="display: none;"></canvas>
 
             <!-- 
                 Secondary canvas for Player 2.
                 Only displayed when two-player mode is enabled.
             -->
-            <canvas id="myCanvas2" width="900" height="800" style="display: none;"></canvas>
+            <canvas id="myCanvas2" width="900" height="600" style="display: none;"><button></button></canvas>
         </div>
 
         <!-- 
@@ -108,7 +108,12 @@
                 Retry button represented as an image.
                 Click handling is managed in main.js.
             -->
-            <img id="retry" src="./assets/images/retry.png" alt="Retry" />
+            <img class="button" id="retry" src="./assets/images/retry.png" alt="Retry" />
+        </div>
+
+        <div class="center" id="menu-buttons">
+            <button class="menu-button" id="highscores-button">See high scores</button>
+            <button class="menu-button" id="toggleNumberOfPlayers-button">Add a player</button>
         </div>
 
         <!-- 
@@ -127,6 +132,7 @@
         <script src="./js/Game.js"></script>
         <script src="./js/game.js"></script>
         <script src="./js/highscores.js"></script>
+        <script src="./js/menu.js"></script>
         <script src="./js/main.js"></script>
     </body>
 </html>

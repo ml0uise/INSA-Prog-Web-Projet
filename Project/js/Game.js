@@ -60,6 +60,7 @@ function Game(opts) {
     // Input state flags updated by DOM event handlers.
     this.rightPressed = false;
     this.leftPressed = false;
+    this.directionToken = true;
 
     // Difficulty ramp state and scheduler handle.
     this.difficultyLevel = 1;
@@ -70,6 +71,10 @@ function Game(opts) {
     this.livesLostAnimStart = null;
     this.livesLostAnimDuration = 500;
     this.blinkStart = performance.now();
+
+    // Player "death" visual effect (flash + shake + fade)
+    this.deathAnimStart = null;
+    this.deathAnimDuration = 1200;
 
     // Runtime entities managed by the simulation.
     this.notes = [];
@@ -107,6 +112,12 @@ const gamePrototype = {
 
         document.addEventListener("keydown", this.keyDownHandler, false);
         document.addEventListener("keyup", this.keyUpHandler, false);
+
+        this.canvas.addEventListener("touchstart", (e) => this.touchStartHandler(e), false);
+        this.canvas.addEventListener("touchmove",  (e) => this.touchMoveHandler(e), false);
+        this.canvas.addEventListener("touchend",   (e) => this.touchEndHandler(e), false);
+        this.canvas.addEventListener("touchcancel",(e) => this.touchCancelHandler(e), false);
+
         this.inputAttached = true;
     },
 
@@ -146,13 +157,13 @@ const gamePrototype = {
 
         // Ensures the loop and input handlers are initialized only once.
         if (!this.previewed) {
-            this.attachInput();
             this.loop();
             this.previewed = true;
         }
 
         // When not in preview, the run becomes active: name is resolved, difficulty starts, and music plays.
         if (!preview) {
+            this.attachInput();
             this.username = get_name(this.user).toUpperCase();
             this.gameStarted = true;
             this.startDifficultyRamp();
@@ -213,6 +224,7 @@ const gamePrototype = {
         this.startPromptBlinkStart = performance.now();
         this.livesLostAnimStart = null;
         this.blinkStart = performance.now();
+        this.deathAnimStart = null;
 
         // Entities
         this.notes = [];
@@ -304,6 +316,44 @@ const gamePrototype = {
         }
     },
 
+    touchStartHandler(e) {
+        e.preventDefault();
+        this.syncTouchesToState(e);
+    },
+
+    touchEndHandler(e) {
+        e.preventDefault();
+        this.syncTouchesToState(e);
+    },
+
+    touchMoveHandler(e) {
+        e.preventDefault();
+        this.syncTouchesToState(e);
+    },
+
+    touchCancelHandler(e) {
+        e.preventDefault();
+        this.leftPressed = false;
+        this.rightPressed = false;
+    },
+
+    syncTouchesToState(e) {
+        const rect = this.canvas.getBoundingClientRect();
+
+        let left = false;
+        let right = false;
+
+        const count = Math.min(2, e.touches.length);
+        for (let i = 0; i < count; i++) {
+            let x = e.touches[i].clientX - rect.left;
+            if (x < rect.width / 2) left = true;
+            else right = true;
+        }
+
+        this.leftPressed = left;
+        this.rightPressed = right;
+    },
+
     /* =========================
        Audio helpers
     ========================= */
@@ -378,6 +428,11 @@ const gamePrototype = {
         this.lives = 0;
         this.isGameOver = true;
 
+        // Arms the player death animation once, at the moment game over is reached.
+        if (this.deathAnimStart === null) {
+            this.deathAnimStart = performance.now();
+        }
+
         // Lowers background volume before playing the game over SFX.
         const bgm = this.sfx.backgroundMusic;
         if (bgm) {
@@ -436,11 +491,23 @@ const gamePrototype = {
 
         const step = 10;
 
-        if (this.rightPressed && this.caracterX < this.canvas.width - this.caracterWidth) {
-            this.caracterX += step;
-        } else if (this.leftPressed && this.caracterX > 0) {
-            this.caracterX -= step;
+        if (this.directionToken) {
+            if (this.rightPressed && this.caracterX < this.canvas.width - this.caracterWidth) {
+                this.caracterX += step;
+            } else if (this.leftPressed && this.caracterX > 0) {
+                this.caracterX -= step;
+            }
+            this.directionToken = false;
+        } 
+        else {
+            if (this.leftPressed && this.caracterX > 0) {
+                this.caracterX -= step;
+            } else if (this.rightPressed && this.caracterX < this.canvas.width - this.caracterWidth) {
+                this.caracterX += step;
+            }
+            this.directionToken = true;
         }
+
     },
 
     /**
@@ -504,13 +571,55 @@ const gamePrototype = {
      * Draws the player sprite at the current horizontal position.
      */
     drawPlayer() {
-        this.ctx.drawImage(
-            this.caracter,
-            this.caracterX,
-            this.canvas.height - this.caracterHeight,
-            this.caracterWidth,
-            this.caracterHeight
-        );
+        this.ctx.save();
+
+        let x = this.caracterX;
+        let y = this.canvas.height - this.caracterHeight;
+
+        // Default rendering parameters
+        let alpha = 1;
+        let scale = 1;
+
+        // Death effect: flashes + shake, anchored to bottom of canvas
+        if (this.isGameOver && this.deathAnimStart !== null) {
+            const elapsed = performance.now() - this.deathAnimStart;
+            const p = Math.min(1, elapsed / this.deathAnimDuration);
+
+            // No fade-out anymore
+            let alpha = 1;
+
+            // Slight shrink
+            const scale = 1 - 0.08 * p;
+
+            // Flashing
+            const flash = 0.4 + 0.6 * Math.abs(Math.sin(elapsed / 45));
+            this.ctx.globalAlpha = alpha * (0.35 + 0.65 * flash);
+
+            // Horizontal shake only
+            const shakeX = (Math.random() - 0.5) * 10 * (1 - p);
+
+            // Player is always anchored to the bottom
+            const baseX = this.caracterX + this.caracterWidth / 2;
+            const baseY = this.canvas.height; // bottom anchor
+
+            this.ctx.translate(baseX + shakeX, baseY);
+            this.ctx.scale(scale, scale);
+
+            this.ctx.drawImage(
+                this.caracter,
+                -this.caracterWidth / 2,
+                -this.caracterHeight,
+                this.caracterWidth,
+                this.caracterHeight
+            );
+
+            this.ctx.restore();
+            return;
+        }
+
+        // Normal player rendering
+        this.ctx.drawImage(this.caracter, x, y, this.caracterWidth, this.caracterHeight);
+        this.ctx.restore();
     },
 
     /**
@@ -660,7 +769,7 @@ const gamePrototype = {
         this.ctx.shadowColor = "#00faff";
         this.ctx.shadowBlur = 10;
         this.ctx.fillText(
-            "PRESS ENTER TO START",
+            "INSERT A COIN TO PLAY",
             this.canvas.width / 2,
             this.canvas.height / 2 - 70
         );
@@ -668,17 +777,19 @@ const gamePrototype = {
         this.ctx.shadowColor = "#00e1ff";
         this.ctx.shadowBlur = 25;
         this.ctx.fillText(
-            "PRESS ENTER TO START",
+            "INSERT A COIN TO PLAY",
             this.canvas.width / 2,
             this.canvas.height / 2 - 70
         );
 
         this.ctx.shadowBlur = 50;
         this.ctx.fillText(
-            "PRESS ENTER TO START",
+            "INSERT A COIN TO PLAY",
             this.canvas.width / 2,
             this.canvas.height / 2 - 70
         );
+
+        this.ctx.font = "bold 1rem 'Press Start 2P', cursive";
 
         // Slightly reduces transparency for secondary text while keeping the blink feel.
         this.ctx.globalAlpha = 0.9;
@@ -687,7 +798,7 @@ const gamePrototype = {
         this.ctx.shadowColor = "#00faff";
         this.ctx.shadowBlur = 10;
         this.ctx.fillText(
-            "Q/D (←/→) TO MOVE RIGHT/LEFT",
+            "PRESS ENTER, CLICK, OR TOUCH THE SCREEN TO START",
             this.canvas.width / 2,
             this.canvas.height / 2 - 10
         );
@@ -695,29 +806,22 @@ const gamePrototype = {
         this.ctx.shadowColor = "#00e1ff";
         this.ctx.shadowBlur = 25;
         this.ctx.fillText(
-            "Q/D (←/→) TO MOVE RIGHT/LEFT",
+            "PRESS ENTER, CLICK, OR TOUCH THE SCREEN TO START",
             this.canvas.width / 2,
             this.canvas.height / 2 - 10
         );
 
         this.ctx.shadowBlur = 50;
         this.ctx.fillText(
-            "Q/D (←/→) TO MOVE RIGHT/LEFT",
+            "PRESS ENTER, CLICK, OR TOUCH THE SCREEN TO START",
             this.canvas.width / 2,
             this.canvas.height / 2 - 10
         );
 
-        /* =========================
-        SECONDARY ACTION
-        ========================= */
-
-        // Secondary actions are rendered smaller to reduce visual competition with the main prompt.
-        this.ctx.font = "bold 1rem 'Press Start 2P', cursive";
-
         this.ctx.shadowColor = "#00faff";
         this.ctx.shadowBlur = 10;
         this.ctx.fillText(
-            "SPACE FOR HIGHSCORES - P TO ADD/REMOVE A PLAYER",
+            "SPACE FOR HIGH SCORES  /  P TO ADD/REMOVE A PLAYER",
             this.canvas.width / 2,
             this.canvas.height / 2 + 50
         );
@@ -725,10 +829,64 @@ const gamePrototype = {
         this.ctx.shadowColor = "#00e1ff";
         this.ctx.shadowBlur = 25;
         this.ctx.fillText(
-            "SPACE FOR HIGHSCORES - P TO ADD/REMOVE A PLAYER",
+            "SPACE FOR HIGH SCORES  /  P TO ADD/REMOVE A PLAYER",
             this.canvas.width / 2,
             this.canvas.height / 2 + 50
         );
+
+        this.ctx.shadowBlur = 50;
+        this.ctx.fillText(
+            "SPACE FOR HIGH SCORES  /  P TO ADD/REMOVE A PLAYER",
+            this.canvas.width / 2,
+            this.canvas.height / 2 + 50
+        );
+
+        this.ctx.shadowColor = "#00faff";
+        this.ctx.shadowBlur = 10;
+        this.ctx.fillText(
+            "PRESS Q/D (P1), ←/→ (P2) OR TOUCH SCREEN RIGHT/LEFT TO MOVE",
+            this.canvas.width / 2,
+            this.canvas.height / 2 + 110
+        );
+
+        this.ctx.shadowColor = "#00e1ff";
+        this.ctx.shadowBlur = 25;
+        this.ctx.fillText(
+            "PRESS Q/D (P1), ←/→ (P2) OR TOUCH SCREEN RIGHT/LEFT TO MOVE",
+            this.canvas.width / 2,
+            this.canvas.height / 2 + 110
+        );
+
+        this.ctx.shadowBlur = 50;
+        this.ctx.fillText(
+            "PRESS Q/D (P1), ←/→ (P2) OR TOUCH SCREEN RIGHT/LEFT TO MOVE",
+            this.canvas.width / 2,
+            this.canvas.height / 2 + 110
+        );
+
+        this.ctx.shadowColor = "#00faff";
+        this.ctx.shadowBlur = 10;
+        this.ctx.fillText(
+            "COLLECT A/B/C/D/E GRADES AND AVOID DEADLY F/Fx ONES !",
+            this.canvas.width / 2,
+            this.canvas.height / 2 + 170
+        );
+
+        this.ctx.shadowColor = "#00faff";
+        this.ctx.shadowBlur = 10;
+        this.ctx.fillText(
+            "COLLECT A/B/C/D/E GRADES AND AVOID DEADLY F/Fx ONES !",
+            this.canvas.width / 2,
+            this.canvas.height / 2 + 170
+        );
+
+        this.ctx.shadowColor = "#00e1ff";
+        this.ctx.shadowBlur = 25;
+        this.ctx.fillText(
+            "COLLECT A/B/C/D/E GRADES AND AVOID DEADLY F/Fx ONES !",
+            this.canvas.width / 2,
+            this.canvas.height / 2 + 170
+        )
 
         /* =========================
         AUDIO NOTICE (NON-BLINKING)
@@ -745,7 +903,7 @@ const gamePrototype = {
         this.ctx.fillText(
             "ENABLE SOUND FOR MORE FUN",
             this.canvas.width / 2,
-            this.canvas.height / 2 + 110
+            this.canvas.height / 2 + 210
         );
 
         this.ctx.restore();

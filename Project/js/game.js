@@ -4,15 +4,33 @@
  *
  * @param {number} numberOfPlayers - The number of players selected
  */
-function showGame(numberOfPlayers) {
+function showGame(numberOfPlayers, preview) {
     const game = document.getElementById("game");
 
     // Makes the main game container visible
     game.style.display = "flex";
 
     const canvas1 = document.getElementById("myCanvas1");
+    const canvas2 = document.getElementById("myCanvas2");
 
     // Sets default canvas size for single-player mode
+    if (preview) {
+        canvas1.height = 600;
+        canvas2.height = 600;
+        canvas1.style.animation = "canvasBlink 1s infinite";
+        canvas2.style.animation = "canvasBlink 1s infinite";
+        canvas1.classList.remove("no-hover-no-active");
+        canvas2.classList.remove("no-hover-no-active");
+    }
+    else {
+        canvas1.height = 800;
+        canvas2.height = 800;
+        canvas1.style.animation = "none";
+        canvas2.style.animation = "none";
+        canvas1.classList.add("no-hover-no-active");
+        canvas2.classList.add("no-hover-no-active");
+    }
+
     canvas1.width = 1000;
     canvas1.style.display = "flex";
 
@@ -20,13 +38,9 @@ function showGame(numberOfPlayers) {
         // Reduces canvas width to accommodate a second canvas
         canvas1.width = 900;
 
-        const canvas2 = document.getElementById("myCanvas2");
-
         // Displays the second canvas for Player 2
         canvas2.style.display = "flex"
     } else {
-        const canvas2 = document.getElementById("myCanvas2");
-
         // Hides the second canvas when only one player is active
         canvas2.style.display = "none"
     }

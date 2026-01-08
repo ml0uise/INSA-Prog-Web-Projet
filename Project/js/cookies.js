@@ -137,7 +137,7 @@ function change_name(user) {
     // Adapts control hints based on the player slot.
     let touches = (user === "Player 1") ? "Q / D" : "← / →";
 
-    let name = prompt(`${user.toUpperCase()}, PLEASE ENTER YOUR USERNAME BELOW\n\n    (MAX 12 CHARACTERS)\n\nAND THEN PRESS\n\n    ${touches}\n\nTO MOVE TO THE\n\n    RIGHT / LEFT\n\n`, def);
+    let name = prompt(`${user.toUpperCase()}, PLEASE ENTER YOUR USERNAME:`, def);
 
     // Falls back to the default identifier if the input is cancelled or empty.
     if (name === null || name.trim() === "") {

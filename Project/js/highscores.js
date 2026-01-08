@@ -106,7 +106,13 @@ function set_highscore_table() {
         const scoreCell = document.createElement("td");
 
         // Rank is always displayed, even for empty slots.
-        rankCell.textContent = (i + 1).toString();
+        if (i === 0) {
+            row.id = "majored";
+            rankCell.textContent = "MAJOR";
+        }
+        else {
+            rankCell.textContent = (i + 1).toString();
+        }
 
         // Populates the row when a stored highscore exists for the current index.
         if (HIGHSCORES.length > i) {
