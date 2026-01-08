@@ -233,6 +233,14 @@ const gamePrototype = {
 
         // Player position
         this.caracterX = (this.canvas.width - this.caracterWidth) / 2;
+
+        // Background music volume.
+        let bgm = this.sfx.backgroundMusic;
+        if (bgm) {
+            try {
+                bgm.volume = 1;
+            } catch (e) {}
+        }
     },
 
     /**
@@ -265,19 +273,6 @@ const gamePrototype = {
             setTimeout(() => {                
                 // Stops the difficulty ramp to prevent background mutation after gameplay ends.
                 this.stopDifficultyRamp();
-
-                // Keeps background music available at a lower volume on the highscores screen.
-                const bgm = this.sfx.backgroundMusic;
-                if (bgm) {
-                    try {
-                        bgm.volume = 0.6;
-                    } catch (e) {}
-                }
-
-                // Winner alert.
-                if (numberOfPlayers === 2) {
-                    twoPlayersWinnerAlert(this.user, this.score, myUserFriend, myUserFriendScore);
-                }
 
                 // Navigates to the highscores view and optionally updates persistence.
                 viewHighscores(numberOfPlayers, update, true, this.user, this.score, myUserFriend, myUserFriendScore);
@@ -474,14 +469,6 @@ const gamePrototype = {
         // Arms the player death animation once, at the moment game over is reached.
         if (this.deathAnimStart === null) {
             this.deathAnimStart = performance.now();
-        }
-
-        // Lowers background volume before playing the game over SFX.
-        const bgm = this.sfx.backgroundMusic;
-        if (bgm) {
-            try {
-                bgm.volume = 0.2;
-            } catch (e) {}
         }
 
         this.playSfx("gameOver");

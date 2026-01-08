@@ -48,6 +48,18 @@ function viewHighscores(numberOfPlayers, update, direct=false, thisUser=null, th
 
     // Delegates persistence and rendering to the highscores workflow.
     printHighScores(numberOfPlayers, update, direct, thisUser, thisScore, myUserFriend, myUserFriendScore);
+
+    // Background music volume.
+    let bgm = game1.sfx.backgroundMusic;
+    if (bgm) {
+        try {
+            bgm.volume = 0.5;
+        } catch (e) {}
+    }
+
+    if (numberOfPlayers === 2 && direct) {
+        twoPlayersWinnerAlert(thisUser, thisScore, myUserFriend, myUserFriendScore);
+    }
 }
 
 /**
