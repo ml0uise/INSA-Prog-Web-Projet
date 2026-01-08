@@ -47,20 +47,21 @@ No external JavaScript frameworks were used.
 
 ```text
 /
-├── index.html              # Main HTML entry point
+├── index.html                # Main HTML entry point
 ├── css/
-│   └── game.css            # Global styles, animations, UI effects
+│   └── game.css              # Global styles, animations, UI effects
 ├── js/
-│   ├── cookies.js          # Session storage, player names, highscores
-│   ├── NoteType.js         # Note behavior strategies
-│   ├── Note.js             # Falling note entity
-│   ├── Game.js             # Core game engine and main loop
-│   ├── game.js             # Game initialization and asset binding
-│   ├── highscores.js       # Highscores rendering logic
-│   └── main.js             # Global control flow, input routing, and UI transitions
+│   ├── cookies.js            # Session storage helpers (names, scores, highscores)
+│   ├── NoteType.js           # NoteType registry and onCatch strategies
+│   ├── Note.js               # Falling note runtime entity
+│   ├── Game.js               # Core game engine, state, update/render loop
+│   ├── game.js               # Game instantiation, asset loading, per-player setup
+│   ├── highscores.js         # Highscores computation and table rendering
+│   ├── menu.js               # Menu logic, navigation, and UI transitions
+│   └── main.js               # Global control flow and application bootstrap
 └── assets/
-    ├── images/             # Sprites, UI icons, backgrounds
-    └── sounds/             # Sound effects and background music
+    ├── images/               # Sprites, UI icons, backgrounds
+    └── sounds/               # Sound effects and background music
 ```
 
 ## 🧠 Pedagogical Objectives Addressed
