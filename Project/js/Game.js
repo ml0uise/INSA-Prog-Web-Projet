@@ -1,19 +1,19 @@
 /**
  * Defines the Game object (engine/state owner) and its prototype methods.
  *
- * Game responsibilities:
- *  - Own all mutable runtime state (score, lives, difficulty, entities, input).
- *  - Run the update/render loop.
- *  - Perform spawning and collisions.
- *  - Provide helper methods used by NoteType strategies (onCatch).
+ * Owns the following responsibilities:
+ *  - Owns all mutable runtime state (score, lives, difficulty, entities, input).
+ *  - Runs the update/render loop.
+ *  - Handles spawning and collisions.
+ *  - Exposes helper methods consumed by NoteType strategies (onCatch).
  *
- * Type-specific behavior is pushed into NoteType.onCatch(game, type),
- * which keeps Game largely free of branching per note letter.
+ * Pushes type-specific behavior into NoteType.onCatch(game, type),
+ * keeping Game largely free of per-letter branching.
  */
 
 /**
  * Game constructor.
- * Initializes rendering bindings, player configuration, assets references,
+ * Initializes rendering bindings, player configuration, asset references,
  * runtime state, and precomputations required for weighted note selection.
  *
  * @constructor
@@ -31,7 +31,7 @@ function Game(opts) {
     this.arrowLeft = opts.arrowLeft;
     this.arrowRight = opts.arrowRight;
 
-    // Image assets used by the renderer.
+    // Image assets consumed by the renderer.
     this.background = opts.background;
     this.caracter = opts.caracter;
     this.heartImg = opts.heartImg;
@@ -72,14 +72,14 @@ function Game(opts) {
     this.livesLostAnimDuration = 500;
     this.blinkStart = performance.now();
 
-    // Player "death" visual effect (flash + shake + fade)
+    // Player "death" visual effect (flash + shake + fade).
     this.deathAnimStart = null;
     this.deathAnimDuration = 1200;
 
     // Runtime entities managed by the simulation.
     this.notes = [];
 
-    // Player position initialized at the horizontal center.
+    // Initializes the player position at the horizontal center.
     this.caracterX = (this.canvas.width - this.caracterWidth) / 2;
 
     // Note registry and weighted selection precomputation for efficient spawning.
@@ -94,25 +94,27 @@ function Game(opts) {
 }
 
 /**
- * All Game prototype methods are grouped here for clarity.
- * Methods are organized by domain (lifecycle, input, audio, gameplay, rendering, loop).
+ * Groups Game prototype methods for readability.
+ * Organizes methods by domain (lifecycle, input, audio, gameplay, rendering, loop).
  */
 const gamePrototype = {
     /* =========================
        Bootstrap / lifecycle
     ========================= */
 
-    /**
-     * Attaches keyboard listeners for player controls and "press to start".
-     * Idempotent: calling multiple times will not attach duplicates.
+/**
+     * Attaches keyboard and touch listeners for player controls.
+     * Treats this operation as idempotent to avoid duplicate listener registration.
      */
     attachInput() {
-        // Prevents duplicate listener attachment across restarts/previews.
+        // Prevents duplicate listener attachment across restarts and previews.
         if (this.inputAttached) return;
 
         document.addEventListener("keydown", this.keyDownHandler, false);
         document.addEventListener("keyup", this.keyUpHandler, false);
 
+        // Registers touch listeners on the canvas to support mobile controls.
+        // Uses passive: false semantics via preventDefault() to avoid page scrolling while playing.
         this.canvas.addEventListener("touchstart", (e) => this.touchStartHandler(e), false);
         this.canvas.addEventListener("touchmove",  (e) => this.touchMoveHandler(e), false);
         this.canvas.addEventListener("touchend",   (e) => this.touchEndHandler(e), false);
@@ -122,8 +124,8 @@ const gamePrototype = {
     },
 
     /**
-     * Starts periodic difficulty increase (idempotent).
-     * Difficulty is increased at a fixed time interval.
+     * Starts the periodic difficulty ramp (idempotent).
+     * Increases difficulty at a fixed time interval.
      */
     startDifficultyRamp() {
         // Ensures only one scheduler exists.
@@ -135,8 +137,8 @@ const gamePrototype = {
     },
 
     /**
-     * Stops periodic difficulty increase (idempotent).
-     * This is required to avoid difficulty continuing to mutate after game end.
+     * Stops the periodic difficulty ramp (idempotent).
+     * Prevents difficulty from mutating after the run ends.
      */
     stopDifficultyRamp() {
         if (this.difficultyIntervalId === null) return;
@@ -147,21 +149,21 @@ const gamePrototype = {
 
     /**
      * Starts a run.
-     * In preview mode, it initializes the loop and input without transitioning into gameplay.
+     * In preview mode, initializes the loop without transitioning into active gameplay.
      *
-     * @param {boolean} preview - Whether this call is a "preview" boot (no username/audio ramp)
+     * @param {boolean} preview - Whether this call is a preview boot (no username/audio ramp)
      */
     start(preview) {
         // Releases any cross-player lock to allow a fresh start sequence.
         release_game_state();
 
-        // Ensures the loop and input handlers are initialized only once.
+        // Initializes the loop only once per instance.
         if (!this.previewed) {
             this.loop();
             this.previewed = true;
         }
 
-        // When not in preview, the run becomes active: name is resolved, difficulty starts, and music plays.
+        // In non-preview mode, arms gameplay: resolves name, starts difficulty, and plays music.
         if (!preview) {
             this.attachInput();
             this.username = get_name(this.user).toUpperCase();
@@ -173,12 +175,12 @@ const gamePrototype = {
 
     /**
      * Restarts a new run from a pristine state.
-     * Assets are reused; only runtime state is reset.
+     * Reuses assets; resets only mutable runtime state.
      */
     restart() {
         release_game_state();
 
-        // Ensures the instance is returned to a known initial state.
+        // Returns the instance to a known initial state.
         this.resetStateToDefaults();
 
         // Arms gameplay flags and resumes difficulty progression.
@@ -196,7 +198,7 @@ const gamePrototype = {
 
     /**
      * Resets runtime state to initial defaults.
-     * This method does not recreate assets and does not reattach listeners.
+     * Does not recreate assets and does not reattach listeners.
      */
     resetStateToDefaults() {
         // Gameplay state
@@ -235,10 +237,10 @@ const gamePrototype = {
 
     /**
      * Executes the game-over transition.
-     * The method is guarded to run only once per instance, even if triggered multiple times.
+     * Guards execution to run once per instance, even if triggered multiple times.
      *
      * Multiplayer note:
-     * - It uses a shared session flag to coordinate a single transition to highscores.
+     * - Uses a shared session flag to coordinate a single transition to highscores.
      *
      * @param {boolean} update - Whether highscores should be updated when navigating away
      */
@@ -256,15 +258,15 @@ const gamePrototype = {
         let myUserFriend = gameState[1];
         let myUserFriendScore = gameState[2];
 
-        // Only one player should execute the delayed navigation in multiplayer.
+        // Ensures only one player executes the delayed navigation in multiplayer.
         if (this.numberOfPlayers === 1 || isMyfriendLose) {
 
-            // Delay provides UX time to read "GAME OVER" before leaving the canvas.
+            // Delays navigation to keep "GAME OVER" readable before leaving the canvas.
             setTimeout(() => {                
-                // Stops difficulty ramp to prevent background mutation after gameplay ends.
+                // Stops the difficulty ramp to prevent background mutation after gameplay ends.
                 this.stopDifficultyRamp();
 
-                // Restarts/continues background music softly on the highscores screen, when present.
+                // Keeps background music available at a lower volume on the highscores screen.
                 const bgm = this.sfx.backgroundMusic;
                 if (bgm) {
                     try {
@@ -272,7 +274,7 @@ const gamePrototype = {
                     } catch (e) {}
                 }
 
-                // Winner alert
+                // Winner alert.
                 if (numberOfPlayers === 2) {
                     twoPlayersWinnerAlert(this.user, this.score, myUserFriend, myUserFriendScore);
                 }
@@ -289,7 +291,7 @@ const gamePrototype = {
 
     /**
      * Keydown handler used to set movement state.
-     * Input mapping is configurable via arrowLeft/arrowRight.
+     * Maps movement using the configured arrowLeft/arrowRight codes.
      *
      * @param {KeyboardEvent} e
      */
@@ -316,40 +318,81 @@ const gamePrototype = {
         }
     },
 
+
+    /**
+     * Handles touchstart and synchronizes current touches to movement state.
+     * Prevents default browser behavior (scroll/zoom) to keep touch input dedicated to the game.
+     *
+     * @param {TouchEvent} e
+     */
     touchStartHandler(e) {
         e.preventDefault();
         this.syncTouchesToState(e);
     },
 
+    /**
+     * Handles touchend and synchronizes remaining touches to movement state.
+     * Prevents default behavior to avoid scroll rebound on release.
+     *
+     * @param {TouchEvent} e
+     */
     touchEndHandler(e) {
         e.preventDefault();
         this.syncTouchesToState(e);
     },
 
+    /**
+     * Handles touchmove and continuously refreshes movement state while fingers move.
+     * Prevents default behavior so the canvas does not scroll inside the page.
+     *
+     * @param {TouchEvent} e
+     */
     touchMoveHandler(e) {
         e.preventDefault();
         this.syncTouchesToState(e);
     },
 
+    /**
+     * Handles touchcancel (e.g., OS gesture interruption) and clears movement state.
+     * Resets both directions to avoid "stuck" movement.
+     *
+     * @param {TouchEvent} e
+     */
     touchCancelHandler(e) {
         e.preventDefault();
         this.leftPressed = false;
         this.rightPressed = false;
     },
 
+    /**
+     * Maps active touches to left/right movement flags.
+     * Interprets the canvas as two zones: left half -> move left, right half -> move right.
+     *
+     * Constraints:
+     * - Tracks at most two simultaneous touches (two-finger input cap).
+     * - If at least one touch is in a zone, the corresponding direction is considered pressed.
+     *
+     * @param {TouchEvent} e
+     */
     syncTouchesToState(e) {
+        // Uses the canvas bounding box to convert screen touches into local canvas coordinates.
         const rect = this.canvas.getBoundingClientRect();
 
         let left = false;
         let right = false;
 
+        // Caps processing to two fingers to match the intended control scheme.
         const count = Math.min(2, e.touches.length);
         for (let i = 0; i < count; i++) {
+            // Converts clientX to a position relative to the canvas.
             let x = e.touches[i].clientX - rect.left;
+
+            // Splits the canvas into left/right halves for directional input.
             if (x < rect.width / 2) left = true;
             else right = true;
         }
 
+        // Commits the derived touch state to movement flags.
         this.leftPressed = left;
         this.rightPressed = right;
     },
@@ -359,11 +402,11 @@ const gamePrototype = {
     ========================= */
 
     /**
-     * Plays a sound effect by key, safely.
-     * It avoids hard failures under autoplay restrictions or missing audio assets.
+     * Plays a sound effect by key with defensive guards.
+     * Avoids hard failures under autoplay restrictions or missing audio assets.
      *
-     * For one-shot SFX, it resets currentTime to allow rapid retriggers.
-     * For background music, it does not reset time to preserve continuity.
+     * For one-shot SFX, resets currentTime to support rapid retriggers.
+     * For background music, preserves currentTime to keep continuity.
      *
      * @param {string} key - One of the keys in the sfx map
      */
@@ -373,12 +416,12 @@ const gamePrototype = {
 
         try {
             if (key === "backgroundMusic") {
-                // Background music is started/resumed without seeking to the beginning.
+                // Starts/resumes background music without seeking to the beginning.
                 audio.play().catch(() => {});
                 return;
             }
 
-            // One-shot SFX are restarted from time zero.
+            // Restarts one-shot SFX from time zero.
             audio.currentTime = 0;
             audio.play();
         } catch (e) {
@@ -409,8 +452,8 @@ const gamePrototype = {
     },
 
     /**
-     * Triggers the "damage feedback" animation timer.
-     * This is typically called by damaging note types.
+     * Arms the "damage feedback" animation timer.
+     * Typically called by damaging note types.
      */
     notifyDamage() {
         this.livesLostAnimStart = performance.now();
@@ -418,7 +461,7 @@ const gamePrototype = {
 
     /**
      * Checks whether lives are depleted and transitions to game over state if so.
-     * It also plays the game over SFX (one-shot).
+     * Also plays the game over SFX as a one-shot effect.
      */
     checkGameOver() {
         // Early return preserves performance and avoids double-triggering.
@@ -450,9 +493,9 @@ const gamePrototype = {
 
     /**
      * Performs weighted random selection among note types.
-     * It assumes noteTypes weights are non-negative and totalWeight is valid.
+     * Assumes weights are non-negative and totalWeight is valid.
      *
-     * @returns {NoteType} The selected note type strategy
+     * @returns {NoteType} Selected note type strategy
      */
     getRandomNoteType() {
         const r = Math.random() * this.totalWeight;
@@ -469,7 +512,7 @@ const gamePrototype = {
 
     /**
      * Spawns a new falling note (runtime entity) and stores it.
-     * Note behavior is defined by the NoteType strategy attached to the Note instance.
+     * Delegates behavior to the NoteType strategy attached to the Note instance.
      */
     spawnNote() {
         const type = this.getRandomNoteType();
@@ -483,10 +526,10 @@ const gamePrototype = {
 
     /**
      * Updates player horizontal movement based on current input.
-     * Movement is clamped within the canvas boundaries.
+     * Clamps movement to the canvas boundaries.
      */
     updatePlayer() {
-        // Player movement is frozen once the game is over.
+        // Freezes player movement once the game is over.
         if (this.isGameOver) return;
 
         const step = 10;
@@ -512,9 +555,9 @@ const gamePrototype = {
 
     /**
      * Applies type-specific behavior for a collected note.
-     * The note type owns behavior via its onCatch strategy.
+     * Delegates behavior to the note type via its onCatch strategy.
      *
-     * @param {Note} note - The note entity that collided with the player
+     * @param {Note} note - Note entity that collided with the player
      */
     applyCollisionEffects(note) {
         if (note && note.type && typeof note.type.onCatch === "function") {
@@ -523,11 +566,11 @@ const gamePrototype = {
     },
 
     /**
-     * Updates notes positions, removes out-of-bounds notes, and handles collisions.
-     * It iterates backwards to safely splice notes during traversal.
+     * Updates note positions, removes out-of-bounds notes, and handles collisions.
+     * Iterates backwards to safely splice notes during traversal.
      */
     updateNotes() {
-        // Computes player rectangle once per frame for collision checks.
+        // Computes the player rectangle once per frame for collision checks.
         const paddleX = this.caracterX;
         const paddleY = this.canvas.height - this.caracterHeight;
         const paddleW = this.caracterWidth;
@@ -576,29 +619,29 @@ const gamePrototype = {
         let x = this.caracterX;
         let y = this.canvas.height - this.caracterHeight;
 
-        // Default rendering parameters
+        // Default rendering parameters.
         let alpha = 1;
         let scale = 1;
 
-        // Death effect: flashes + shake, anchored to bottom of canvas
+        // Death effect: flash + shake, anchored to the bottom of the canvas.
         if (this.isGameOver && this.deathAnimStart !== null) {
             const elapsed = performance.now() - this.deathAnimStart;
             const p = Math.min(1, elapsed / this.deathAnimDuration);
 
-            // No fade-out anymore
+            // Keeps alpha stable (no fade-out).
             let alpha = 1;
 
-            // Slight shrink
+            // Applies a slight shrink over the animation.
             const scale = 1 - 0.08 * p;
 
-            // Flashing
+            // Applies a flashing opacity modulation.
             const flash = 0.4 + 0.6 * Math.abs(Math.sin(elapsed / 45));
             this.ctx.globalAlpha = alpha * (0.35 + 0.65 * flash);
 
-            // Horizontal shake only
+            // Applies horizontal shake only.
             const shakeX = (Math.random() - 0.5) * 10 * (1 - p);
 
-            // Player is always anchored to the bottom
+            // Anchors the player to the bottom edge.
             const baseX = this.caracterX + this.caracterWidth / 2;
             const baseY = this.canvas.height; // bottom anchor
 
@@ -617,14 +660,14 @@ const gamePrototype = {
             return;
         }
 
-        // Normal player rendering
+        // Renders the player normally.
         this.ctx.drawImage(this.caracter, x, y, this.caracterWidth, this.caracterHeight);
         this.ctx.restore();
     },
 
     /**
      * Draws every active note entity.
-     * It uses a for...in loop to satisfy coursework loop variety requirements.
+     * Uses a for...in loop to satisfy coursework loop variety requirements.
      */
     drawNotes() {
         for (const index in this.notes) {
@@ -643,7 +686,7 @@ const gamePrototype = {
         this.ctx.textAlign = "left";
         this.ctx.fillStyle = "#00faff";
 
-        // Multiple glow passes improve contrast on complex backgrounds.
+        // Uses multiple glow passes to improve contrast on complex backgrounds.
         this.ctx.shadowColor = "#00faff";
         this.ctx.shadowBlur = 8;
         this.ctx.fillText(`${this.username}: ` + this.score, 20, 40);
@@ -659,9 +702,9 @@ const gamePrototype = {
     },
 
     /**
-     * Draws life hearts on the top-right corner.
-     * It supports full and half lives, includes critical-health blinking,
-     * and provides a pulse/shake feedback after taking damage.
+     * Draws life hearts in the top-right corner.
+     * Supports full and half lives, includes critical-health blinking,
+     * and applies a pulse/shake feedback after taking damage.
      */
     drawLives() {
         this.ctx.save();
@@ -695,7 +738,7 @@ const gamePrototype = {
                 const pulse = Math.sin(p * Math.PI);
                 scale = 1 + 0.18 * pulse;
 
-                // Random shake adds impact feedback; it is bounded to small deltas.
+                // Adds a bounded random shake to reinforce impact feedback.
                 shakeX = (Math.random() - 0.5) * 4;
                 shakeY = (Math.random() - 0.5) * 3;
             } else {
@@ -745,16 +788,21 @@ const gamePrototype = {
 
     /**
      * Draws the start screen overlay.
-     * It includes a blinking primary instruction and secondary hints.
+     * Renders a blinking primary instruction plus secondary hints describing controls and menu shortcuts.
+     *
+     * Rendering notes:
+     * - Uses glow/shadow passes to keep text legible over a busy background.
+     * - Uses a time-based alpha modulation for the "insert coin" effect.
      */
     drawPressToStart() {
         this.ctx.save();
 
-        // Computes a blink alpha for the start prompt to draw attention.
+        // Computes a blinking alpha for the primary prompt to attract attention.
         const t = (performance.now() - this.startPromptBlinkStart) / 1000;
         const blink = 0.25 + 0.75 * (0.5 + 0.5 * Math.sin(t * Math.PI * 4));
         this.ctx.globalAlpha = blink;
 
+        // Centers overlay text in the canvas.
         this.ctx.textAlign = "center";
         this.ctx.textBaseline = "middle";
 
@@ -765,7 +813,7 @@ const gamePrototype = {
         this.ctx.font = "bold 1.8rem 'Press Start 2P', cursive";
         this.ctx.fillStyle = "#00faff";
 
-        // Draws line 1 with multiple glow passes.
+        // Draws the primary message with multiple glow passes.
         this.ctx.shadowColor = "#00faff";
         this.ctx.shadowBlur = 10;
         this.ctx.fillText(
@@ -789,12 +837,13 @@ const gamePrototype = {
             this.canvas.height / 2 - 70
         );
 
+        // Switches to a smaller font for secondary instructions.
         this.ctx.font = "bold 1rem 'Press Start 2P', cursive";
 
-        // Slightly reduces transparency for secondary text while keeping the blink feel.
+        // Keeps secondary instructions readable while maintaining the arcade blink feel.
         this.ctx.globalAlpha = 0.9;
 
-        // Draws line 2 describing movement controls.
+        // Draws the start interaction line (keyboard/mouse/touch).
         this.ctx.shadowColor = "#00faff";
         this.ctx.shadowBlur = 10;
         this.ctx.fillText(
@@ -818,6 +867,7 @@ const gamePrototype = {
             this.canvas.height / 2 - 10
         );
 
+        // Draws menu shortcuts (high scores / player count).
         this.ctx.shadowColor = "#00faff";
         this.ctx.shadowBlur = 10;
         this.ctx.fillText(
@@ -841,6 +891,7 @@ const gamePrototype = {
             this.canvas.height / 2 + 50
         );
 
+        // Draws movement control hints for both players and touch input.
         this.ctx.shadowColor = "#00faff";
         this.ctx.shadowBlur = 10;
         this.ctx.fillText(
@@ -864,14 +915,7 @@ const gamePrototype = {
             this.canvas.height / 2 + 110
         );
 
-        this.ctx.shadowColor = "#00faff";
-        this.ctx.shadowBlur = 10;
-        this.ctx.fillText(
-            "COLLECT A/B/C/D/E GRADES AND AVOID DEADLY F/Fx ONES !",
-            this.canvas.width / 2,
-            this.canvas.height / 2 + 170
-        );
-
+        // Draws the gameplay objective hint (collect/avoid note types).
         this.ctx.shadowColor = "#00faff";
         this.ctx.shadowBlur = 10;
         this.ctx.fillText(
@@ -881,18 +925,24 @@ const gamePrototype = {
         );
 
         this.ctx.shadowColor = "#00e1ff";
+        this.ctx.shadowBlur = 10;
+        this.ctx.fillText(
+            "COLLECT A/B/C/D/E GRADES AND AVOID DEADLY F/Fx ONES !",
+            this.canvas.width / 2,
+            this.canvas.height / 2 + 170
+        );
         this.ctx.shadowBlur = 25;
         this.ctx.fillText(
             "COLLECT A/B/C/D/E GRADES AND AVOID DEADLY F/Fx ONES !",
             this.canvas.width / 2,
             this.canvas.height / 2 + 170
-        )
+        );
 
         /* =========================
         AUDIO NOTICE (NON-BLINKING)
         ========================= */
 
-        // Disables blinking to keep the audio hint readable and stable.
+        // Disables blinking to keep the audio notice stable and readable.
         this.ctx.globalAlpha = 0.9;
 
         this.ctx.font = "bold 1rem 'Press Start 2P', cursive";
@@ -900,6 +950,7 @@ const gamePrototype = {
         this.ctx.shadowColor = "#ffffff";
         this.ctx.shadowBlur = 6;
 
+        // Draws the audio suggestion line.
         this.ctx.fillText(
             "ENABLE SOUND FOR MORE FUN",
             this.canvas.width / 2,
@@ -911,12 +962,12 @@ const gamePrototype = {
 
     /**
      * Draws the "GAME OVER" overlay with a neon blinking effect.
-     * It also triggers the one-shot game-over transition logic.
+     * Also triggers the one-shot game-over transition logic.
      */
     drawGameOver() {
         this.ctx.save();
 
-        // Uses a time-based sine wave for blinking opacity.
+        // Uses a time-based sine wave to drive blinking opacity.
         const t = performance.now() / 1000;
         const blink = 0.25 + 0.75 * (0.5 + 0.5 * Math.sin(t * Math.PI * 4));
         this.ctx.globalAlpha = blink;
@@ -926,7 +977,7 @@ const gamePrototype = {
         this.ctx.textBaseline = "middle";
         this.ctx.fillStyle = "#ff0033";
 
-        // Neon glow layers.
+        // Renders neon glow layers.
         this.ctx.shadowColor = "#ff0033";
         this.ctx.shadowBlur = 15;
         this.ctx.fillText("GAME OVER", this.canvas.width / 2, this.canvas.height / 2);
@@ -941,7 +992,7 @@ const gamePrototype = {
 
         this.ctx.restore();
 
-        // Ensures game-over side effects are executed once.
+        // Ensures game-over side effects execute exactly once.
         if (!this.gameOverAlreadyHandled) {
             this.gameOverAlreadyHandled = true;
             this.gameOver(true);
@@ -953,9 +1004,9 @@ const gamePrototype = {
     ========================= */
 
     /**
-     * Main loop: clears frame, renders background, updates and draws entities,
-     * and draws overlays for start/game over states.
-     * The loop is driven by requestAnimationFrame for smooth animation.
+     * Main loop: clears the frame, renders background, updates and draws entities,
+     * and overlays start/game-over states.
+     * Uses requestAnimationFrame to keep animation smooth and browser-scheduled.
      */
     loop() {
         // Clears the previous frame.
@@ -971,7 +1022,7 @@ const gamePrototype = {
             return;
         }
 
-        // Spawns notes only while the game is running and not yet in game-over.
+        // Spawns notes only while the run is active and not yet in game over.
         if (!this.isGameOver && Math.random() < 0.03 + (this.difficultyLevel / 300)) {
             this.spawnNote();
         }

@@ -1,69 +1,75 @@
 /**
- * Defines the Note runtime entity (one falling instance) and its prototype methods.
+ * Defines the Note runtime entity (a single falling instance) and its prototype methods.
  *
- * Notes reference a NoteType for sprite + gameplay strategy (onCatch).
- * This keeps Note lightweight and focused on movement, rendering and collision tests.
+ * References a NoteType for sprite data and gameplay strategy (onCatch),
+ * keeping this object focused on movement, rendering, and collision detection.
  */
 
 /**
+ * Note constructor.
+ *
  * @constructor
- * @param {NoteType} type - Registry object holding sprite and gameplay strategy.
- * @param {number} canvasWidth - Canvas width used to generate a random spawn position.
- * @param {number} noteW - Render width for notes.
- * @param {number} noteH - Render height for notes.
- * @param {number} difficultyLevel - Difficulty factor used to scale vertical speed.
+ * @param {NoteType} type - Registry entry providing sprite assets and gameplay behavior.
+ * @param {number} canvasWidth - Canvas width used to compute a random horizontal spawn position.
+ * @param {number} noteW - Render width of the note sprite.
+ * @param {number} noteH - Render height of the note sprite.
+ * @param {number} difficultyLevel - Difficulty factor used to scale the vertical falling speed.
  */
 function Note(type, canvasWidth, noteW, noteH, difficultyLevel) {
     this.type = type;
 
-    // Dimensions used for rendering and collision.
+    // Stores dimensions used for rendering and collision checks.
     this.w = noteW;
     this.h = noteH;
 
-    // Spawn position (random X, starts above the visible area).
+    // Computes the spawn position: random X, starting just above the visible canvas.
     this.x = Math.random() * (canvasWidth - this.w);
     this.y = -this.h;
 
-    // Vertical speed increases with difficulty (plus a random component).
+    // Computes vertical speed based on difficulty, with a small random variance.
     this.dy = 2 + (difficultyLevel / 10) + Math.random() * difficultyLevel;
 }
 
 /**
- * Prototype methods grouped in a single object, then assigned at once.
- * This approach is compact and keeps the prototype definition centralized.
+ * Groups all Note prototype methods in a single object.
+ * Keeps the prototype definition centralized and easy to maintain.
  */
 const notePrototype = {
     /**
-     * Updates the note's vertical position.
+     * Updates the note position for the current frame.
+     * Advances the note downward using its precomputed vertical speed.
      */
     update() {
         this.y += this.dy;
     },
 
     /**
-     * Draws the note sprite to the canvas.
-     * @param {CanvasRenderingContext2D} ctx
+     * Renders the note sprite at its current position.
+     *
+     * @param {CanvasRenderingContext2D} ctx - Rendering context used to draw the note
      */
     draw(ctx) {
         ctx.drawImage(this.type.image, this.x, this.y, this.w, this.h);
     },
 
     /**
-     * Checks whether the note is outside the canvas bounds.
-     * @param {number} canvasHeight
-     * @returns {boolean}
+     * Determines whether the note has exited the visible canvas area.
+     *
+     * @param {number} canvasHeight - Height of the canvas in pixels
+     * @returns {boolean} True when the note is fully below the canvas
      */
     isOut(canvasHeight) {
         return this.y > canvasHeight;
     },
 
     /**
-     * Axis-aligned bounding-box collision test against a rectangle.
-     * @param {number} rx
-     * @param {number} ry
-     * @param {number} rw
-     * @param {number} rh
-     * @returns {boolean}
+     * Performs an axis-aligned bounding box (AABB) collision test against a rectangle.
+     *
+     * @param {number} rx - Rectangle X position
+     * @param {number} ry - Rectangle Y position
+     * @param {number} rw - Rectangle width
+     * @param {number} rh - Rectangle height
+     * @returns {boolean} True when the note intersects the given rectangle
      */
     collidesWithRect(rx, ry, rw, rh) {
         return (
@@ -75,4 +81,5 @@ const notePrototype = {
     }
 };
 
+// Assigns the grouped methods to the Note prototype.
 Object.assign(Note.prototype, notePrototype);

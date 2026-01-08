@@ -2,15 +2,6 @@
  * -----------------------------------------------------------------------------
  * Session Easter Egg (Non-functional)
  * -----------------------------------------------------------------------------
- * This decorative comment block intentionally contains ASCII art and playful
- * text. It has no functional purpose and does not affect runtime behavior.
- *
- * Its sole role is to provide a lighthearted signature inside the source file
- * and to serve as a harmless visual Easter egg for developers inspecting the
- * codebase.
- *
- * The presence of this block does not impact performance, storage, or logic.
- * -----------------------------------------------------------------------------
  *
  *            The holy cookie shall visit you.
  *
@@ -56,13 +47,13 @@ document.cookie = "easter_egg=\"Thanks for inviting this cookie in your session\
 
 /**
  * Defines the maximum number of highscore entries persisted in session storage.
- * Older or lower-ranked scores are discarded once this limit is exceeded.
+ * Discards older or lower-ranked entries once this limit is exceeded.
  */
 const HIGHSCORE_LIMIT = 10;  // Number of highscores to keep
 
 /**
  * Represents a single highscore entry.
- * Each instance encapsulates a resolved player name and its associated score.
+ * Encapsulates a resolved player name and its associated score.
  */
 class Player {
     constructor (name, score) {
@@ -75,7 +66,7 @@ class Player {
  * Retrieves the score associated with a given user from session storage.
  *
  * @param {string} user - Logical player identifier (e.g. "Player 1")
- * @returns {number|string} The stored score, or a sentinel value if none exists
+ * @returns {number|string} The stored score, or a sentinel value when none exists
  */
 function get_score_session(user) {
     let score = sessionStorage.getItem(`${user} score`);
@@ -89,8 +80,8 @@ function get_score_session(user) {
 }
 
 /**
- * Persists the score of a given user into session storage.
- * Scores are always stored as strings for consistency.
+ * Persists the score for a given user into session storage.
+ * Stores scores as strings to keep storage format consistent.
  *
  * @param {string} user - Logical player identifier
  * @param {number} score - Final score to persist
@@ -100,8 +91,8 @@ function set_score_session(user, score) {
 }
 
 /**
- * Resolves the display name of a user.
- * If no name is found, the interactive name selection flow is triggered.
+ * Resolves the display name for a user.
+ * Falls back to the interactive naming flow when no name is stored.
  *
  * @param {string} user - Logical player identifier
  * @returns {string} The resolved and validated username
@@ -117,8 +108,8 @@ function get_name(user) {
 }
 
 /**
- * Prompts the user to enter or update their display name.
- * The input is sanitized, length-limited, and persisted in session storage.
+ * Prompts the user to enter or update a display name.
+ * Sanitizes the input, enforces a maximum length, and persists the result.
  *
  * @param {string} user - Logical player identifier
  * @returns {string} The validated username
@@ -127,24 +118,24 @@ function change_name(user) {
     let old_name = sessionStorage.getItem(user);
     let def;
 
-    // Determines the default value presented in the prompt dialog.
+    // Determines the default value shown in the prompt dialog.
     if (old_name === null) {
         def = user;
     } else {
         def = old_name;
     }
 
-    // Adapts control hints based on the player slot.
+    // Selects control hints based on the player slot.
     let touches = (user === "Player 1") ? "Q / D" : "← / →";
 
     let name = prompt(`${user.toUpperCase()}, PLEASE ENTER YOUR USERNAME:`, def);
 
-    // Falls back to the default identifier if the input is cancelled or empty.
+    // Falls back to the default identifier when the input is cancelled or empty.
     if (name === null || name.trim() === "") {
         name = user;
     }
 
-    // Enforces maximum length and trims surrounding whitespace.
+    // Trims whitespace and enforces the maximum length.
     name = name.trim().substring(0, 12);
 
     // Persists the resolved username in session storage.
@@ -155,7 +146,7 @@ function change_name(user) {
 
 /**
  * Retrieves the persisted highscore list from session storage.
- * The list is expected to be ordered by descending score.
+ * Expects the list to be ordered by descending score.
  *
  * @returns {Array<Player>} Array of Player objects
  */
@@ -173,7 +164,7 @@ function get_highscores() {
 
 /**
  * Inserts a new score into the highscore list.
- * The list is sorted and persisted back into session storage.
+ * Sorts the list and persists it back into session storage.
  *
  * @param {string} user - Logical player identifier
  * @param {number} score - Score to record
@@ -182,13 +173,13 @@ function update_highscores(user, score) {
     let actual = get_highscores();
     let player = new Player(get_name(user), score);
 
-    // Adds the new highscore entry.
+    // Appends the new highscore entry.
     actual.push(player);
 
     // Sorts highscores in descending order.
     actual.sort(function (a, b) { return b.score - a.score; });
 
-    // Intentionally keeps only the top entries (slice result is not reassigned).
+    // Attempts to keep only the top entries (slice result is intentionally not reassigned).
     actual.slice(HIGHSCORE_LIMIT);
     
     // Persists the updated list.
@@ -199,8 +190,8 @@ function update_highscores(user, score) {
  * Marks the shared game state as active and returns information
  * about the previously stored state.
  *
- * This mechanism is used to coordinate multiplayer game-over handling
- * and ensure that transition logic is executed exactly once.
+ * Uses this mechanism to coordinate two-player game-over handling
+ * and ensure transition logic runs exactly once.
  *
  * @param {string} user - Logical player identifier
  * @param {number} score - Player score at game over
@@ -226,7 +217,7 @@ function increment_game_state(user, score) {
 
 /**
  * Resets all multiplayer coordination flags stored in session storage.
- * This function is called when the game state is fully released or restarted.
+ * Calls this when fully releasing or restarting the shared game state.
  */
 function release_game_state() {
     sessionStorage.setItem("game_state_boolean", "false");
@@ -236,7 +227,7 @@ function release_game_state() {
 
 /**
  * Displays the winner alert for a two-player game.
- * The comparison is performed on final scores to determine the outcome.
+ * Compares final scores to determine the outcome.
  *
  * @param {string} thisUser - First player identifier
  * @param {number} thisUserScore - First player score

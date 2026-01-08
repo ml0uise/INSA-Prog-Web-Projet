@@ -1,6 +1,7 @@
 /* 
- * Applies a global CSS reset to remove default browser spacing.
- * This ensures consistent layout rendering across browsers.
+ * Applies a global CSS reset.
+ * Removes default browser padding and margins to standardize layout behavior
+ * across user agents.
  */
 * {
     padding: 0;
@@ -8,8 +9,8 @@
 }
 
 /*
- * Forces the root and body elements to occupy the full viewport.
- * This is required for reliable vertical centering and background sizing.
+ * Forces both the root element and the document body to fully occupy the viewport.
+ * Guarantees predictable sizing for flex layouts and background scaling.
  */
 html, body {
     height: 100%;
@@ -17,8 +18,9 @@ html, body {
 }
 
 /*
- * Defines the page background styling.
- * The image is fixed to the viewport and scaled to fully cover the screen.
+ * Defines the global page background.
+ * Pins the image to the viewport and scales it to cover the screen while
+ * preserving aspect ratio.
  */
 body {
     background-image: url("../assets/images/background.jpg");
@@ -28,8 +30,8 @@ body {
 }
 
 /*
- * Provides a reusable flex-centering utility.
- * It horizontally and vertically centers children and ensures full-width layout.
+ * Provides a generic flex-based centering utility.
+ * Reuses this class across the UI to horizontally and vertically align content.
  */
 .center {
     display: -webkit-box;
@@ -44,8 +46,9 @@ body {
 }
 
 /*
- * Styles the main game title with a retro arcade font and a neon red glow.
- * The stroke and layered shadows improve readability on busy backgrounds.
+ * Styles the main game title.
+ * Uses a retro arcade font and an outline stroke to maintain readability
+ * over a detailed background.
  */
 #game-title {
     font-family: 'Press Start 2P', cursive;
@@ -60,8 +63,9 @@ body {
 }
 
 /*
- * Styles the game canvas area.
- * The canvas is sized responsively with a neon border and glow effect.
+ * Styles the gameplay canvas.
+ * Keeps the canvas responsive, adds a neon border for emphasis,
+ * and applies a subtle blink to convey interactivity.
  */
 canvas {
     background: black;
@@ -89,35 +93,22 @@ canvas {
     transition: transform 0.15s ease;
 }
 
+/*
+ * Defines a subtle opacity animation for the canvas.
+ * Simulates a soft neon flicker without reducing gameplay clarity.
+ */
 @keyframes canvasBlink {
-    0%, 100% {
-        opacity: 1;
-    }
-
-    10%, 90% {
-        opacity: 0.98;
-    }
-
-    20%, 80% {
-        opacity: 0.96;
-    }
-
-    30%, 70% {
-        opacity: 0.94;
-    }
-
-    40%, 60% {
-        opacity: 0.92;
-    }
-
-    50% {
-        opacity: 0.90;
-    }
+    0%, 100% { opacity: 1; }
+    10%, 90% { opacity: 0.98; }
+    20%, 80% { opacity: 0.96; }
+    30%, 70% { opacity: 0.94; }
+    40%, 60% { opacity: 0.92; }
+    50%      { opacity: 0.90; }
 }
 
 /*
- * Defines the layout box for the score display area.
- * Vertical margins create separation from the canvas and other UI elements.
+ * Defines vertical spacing around the score container.
+ * Separates the score from gameplay and other UI blocks.
  */
 #score {
     margin-top: 3vh;
@@ -125,8 +116,9 @@ canvas {
 }
 
 /*
- * Styles the score value with a yellow neon theme and a blinking animation.
- * The semi-transparent background improves contrast against the page background.
+ * Styles the score display.
+ * Uses a yellow neon theme and a blink animation to emphasize score prominence
+ * while keeping strong contrast against the background.
  */
 #score-value {
     display: inline-block;
@@ -157,8 +149,8 @@ canvas {
 }
 
 /*
- * Defines the blinking pattern used by the score indicator.
- * Opacity and glow are modulated to simulate an arcade-style neon flicker.
+ * Defines the blinking animation used by the score display.
+ * Varies opacity and glow intensity to emulate an arcade-style LED flicker.
  */
 @keyframes scoreBlink {
     0%, 45%, 100% {
@@ -184,7 +176,7 @@ canvas {
 
 /*
  * Styles the highscores container.
- * It uses a column layout and a cyan neon glow theme matching the HUD.
+ * Uses compact typography and a cyan glow to match the HUD aesthetic.
  */
 #highscores {
     flex-direction: column;
@@ -198,9 +190,13 @@ canvas {
 
     text-shadow:
         0 0 0.2vh #00faff,
-        0 0 0.6vh   #00e1ff;
+        0 0 0.6vh #00e1ff;
 }
 
+/*
+ * Highlights a special “majored” state using a blinking yellow emphasis.
+ * Uses this to draw attention to the rank 1.
+ */
 #majored {
     animation: majoredBlink 1.5s infinite;
 
@@ -211,22 +207,18 @@ canvas {
         0 0 0.6vh  #ffea00;
 }
 
+/*
+ * Defines the blinking animation used for emphasized score elements.
+ */
 @keyframes majoredBlink {
-    0%, 45%, 100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.35;
-    }
-
-    55% {
-        opacity: 1;
-    }
+    0%, 45%, 100% { opacity: 1; }
+    50%          { opacity: 0.35; }
+    55%          { opacity: 1; }
 }
+
 /*
  * Styles the highscores title banner.
- * A white outline and cyan stroke provide strong contrast and hierarchy.
+ * Increases visual hierarchy with a larger font and a glowing framed container.
  */
 #highscores-title {
     font-size: 2.5rem;
@@ -250,8 +242,8 @@ canvas {
 }
 
 /*
- * Configures the highscores table for fixed layout.
- * This prevents column width shifts when content lengths vary.
+ * Configures the highscores table layout.
+ * Uses a fixed layout to prevent column width jitter as content updates.
  */
 #highscores-table {
     max-width: 100vw;
@@ -263,8 +255,8 @@ canvas {
 }
 
 /*
- * Defines consistent cell sizing and alignment.
- * No wrapping is allowed to preserve the pixel-art aesthetic and row height.
+ * Defines consistent table cell spacing and alignment.
+ * Disables wrapping to keep row height stable and preserve alignment.
  */
 #highscores-table th,
 #highscores-table td {
@@ -274,8 +266,8 @@ canvas {
 }
 
 /*
- * Makes the table body scrollable while keeping the header fixed.
- * The body is displayed as a block to enable overflow scrolling.
+ * Makes the highscores table body scrollable while keeping the header fixed.
+ * Improves readability when the score list exceeds the visible area.
  */
 #highscores-table tbody {
     display: block;
@@ -291,8 +283,7 @@ canvas {
 }
 
 /*
- * Ensures header and body rows share the same column widths.
- * Displaying rows as tables with fixed layout maintains alignment.
+ * Ensures column alignment between header and body rows.
  */
 #highscores-table thead,
 #highscores-table tbody tr {
@@ -302,7 +293,7 @@ canvas {
 }
 
 /*
- * Applies a white color to the table header to emphasize column labels.
+ * Styles the table header to clearly differentiate column labels.
  */
 #highscores-table thead {
     color: #ffffff;
@@ -311,8 +302,9 @@ canvas {
 }
 
 /*
- * Styles the retry button with a neon blue theme and pulsing animation.
- * The large dimensions make it accessible and visually prominent.
+ * Styles the retry button.
+ * Uses a neon blue theme and a pulsing animation to attract attention
+ * and communicate clickability.
  */
 #retry {
     border-radius: 2vh;
@@ -335,8 +327,8 @@ canvas {
 }
 
 /*
- * Defines the pulsing pattern for the retry button.
- * It alternates brightness and opacity to simulate a neon flicker.
+ * Defines the pulsing animation used by the retry button.
+ * Modulates brightness and opacity to simulate a neon tube flicker.
  */
 @keyframes retryPulse {
     0%, 55% {
@@ -358,8 +350,8 @@ canvas {
 }
 
 /*
- * Provides a quick "press" feedback on hover.
- * The translation simulates a physical button being pushed.
+ * Provides tactile feedback on hover for interactive elements.
+ * Uses a slight translation to mimic a physical button press.
  */
 #retry:hover, .menu-button:hover, canvas:hover {
     transition-duration: 10ms;
@@ -369,18 +361,26 @@ canvas {
 }
 
 /*
- * Reinforces the pressed state on click/tap.
- * The same translation is applied for consistent interaction feedback.
+ * Reinforces the pressed state during active interaction.
  */
 #retry:active, .menu-button:active, canvas:active {
   transform: translateX(0.5vh, 0.5vh);
 }
 
+/*
+ * Disables hover and active feedback for canvases explicitly marked as inactive.
+ * Uses this for non-interactive states such as previews or locked screens.
+ */
 canvas.no-hover-no-active {
     transform: none;
     cursor: none;
 }
 
+/*
+ * Styles generic menu buttons.
+ * Reuses the neon palette and typography to keep the UI visually consistent
+ * with the rest of the interface.
+ */
 .menu-button {
     font-family: 'Press Start 2P', cursive;
     font-size: 1.5rem;

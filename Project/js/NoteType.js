@@ -1,21 +1,23 @@
 /**
- * Defines the NoteType "class" and a factory-based registry.
+ * Defines the NoteType abstraction and the factory-based registry used by the game.
  *
- * A NoteType contains immutable/static data shared by all notes of that type:
+ * A NoteType holds immutable, shared data for all notes of that type:
  *  - weighted spawn probability
- *  - scoring and life impact
+ *  - score and life impact values
  *  - preloaded sprite image
- *  - onCatch strategy (applies gameplay effects when the note is collected)
+ *  - onCatch strategy executed when the note is collected
  */
 
 /**
+ * NoteType constructor.
+ *
  * @constructor
- * @param {string} name - Human-readable identifier (e.g., "A", "Fx").
- * @param {string} src - Sprite URL.
- * @param {number} weight - Relative spawn probability weight (used in weighted random).
- * @param {number} scoreValue - Points awarded when collected.
- * @param {number} lifeDelta - Life variation (supports halves, e.g., -0.5).
- * @param {(game: any, type: NoteType) => void} onCatch - Strategy called when collected.
+ * @param {string} name - Human-readable identifier (e.g. "A", "Fx")
+ * @param {string} src - Sprite image URL
+ * @param {number} weight - Relative spawn probability weight used for weighted selection
+ * @param {number} scoreValue - Points awarded when the note is collected
+ * @param {number} lifeDelta - Life variation applied on collection (supports fractional values)
+ * @param {(game: any, type: NoteType) => void} onCatch - Strategy executed when the note is collected
  */
 function NoteType(name, src, weight, scoreValue, lifeDelta, onCatch) {
     this.name = name;
@@ -24,28 +26,29 @@ function NoteType(name, src, weight, scoreValue, lifeDelta, onCatch) {
     this.score = scoreValue;
     this.lifeDelta = lifeDelta;
 
-    // Strategy function executed on collection (keeps Game free of type-specific branching).
+    // Stores the strategy executed on collection to avoid type-specific branching in Game.
     this.onCatch = onCatch;
 
-    // Preload the sprite once per type (critical for performance).
+    // Preloads the sprite once per type to avoid runtime image creation.
     this.image = new Image();
     this.image.src = src;
 }
 
 /**
- * Factory helper: creates a NoteType from a configuration object.
- * @param {Object} cfg
- * @returns {NoteType}
+ * Factory helper used to instantiate a NoteType from a configuration object.
+ *
+ * @param {Object} cfg - Plain configuration object describing a note type
+ * @returns {NoteType} Instantiated NoteType
  */
 function makeNoteType(cfg) {
     return new NoteType(cfg.name, cfg.src, cfg.weight, cfg.score, cfg.lifeDelta, cfg.onCatch);
 }
 
 /**
- * Builds the NoteType registry (array) using factory-created configurations.
- * Each type defines its own onCatch behavior.
+ * Builds and returns the NoteType registry.
+ * Each entry defines its own onCatch behavior, encapsulating gameplay effects.
  *
- * @returns {NoteType[]}
+ * @returns {NoteType[]} Array of all available note types
  */
 function buildNoteTypes() {
     return [
@@ -56,6 +59,7 @@ function buildNoteTypes() {
             score: 100,
             lifeDelta: 0.25,
             onCatch(game, type) {
+                // High-value note: rewards score and slightly restores life.
                 game.addScore(type.score);
                 game.addLives(type.lifeDelta);
                 game.playSfx("goodA");
@@ -68,6 +72,7 @@ function buildNoteTypes() {
             score: 50,
             lifeDelta: 0,
             onCatch(game, type) {
+                // Standard positive note: awards score only.
                 game.addScore(type.score);
                 game.playSfx("good");
             }
@@ -79,6 +84,7 @@ function buildNoteTypes() {
             score: 30,
             lifeDelta: 0,
             onCatch(game, type) {
+                // Standard positive note: awards score only.
                 game.addScore(type.score);
                 game.playSfx("good");
             }
@@ -90,6 +96,7 @@ function buildNoteTypes() {
             score: 20,
             lifeDelta: 0,
             onCatch(game, type) {
+                // Low-value positive note: awards a small score increment.
                 game.addScore(type.score);
                 game.playSfx("good");
             }
@@ -101,6 +108,7 @@ function buildNoteTypes() {
             score: 10,
             lifeDelta: 0,
             onCatch(game, type) {
+                // Minimal-value positive note: awards a small score increment.
                 game.addScore(type.score);
                 game.playSfx("good");
             }
@@ -112,7 +120,7 @@ function buildNoteTypes() {
             score: 0,
             lifeDelta: -0.5,
             onCatch(game, type) {
-                // Damage note: apply life loss, trigger feedback, then check for game over.
+                // Damage note: applies life loss, triggers feedback, and checks for game over.
                 game.addLives(type.lifeDelta);
                 game.notifyDamage();
                 game.playSfx("bad");
@@ -126,7 +134,7 @@ function buildNoteTypes() {
             score: 0,
             lifeDelta: -1,
             onCatch(game, type) {
-                // Heavy damage note: same pipeline as Fx, stronger life loss.
+                // Heavy damage note: applies a stronger life loss using the same damage pipeline.
                 game.addLives(type.lifeDelta);
                 game.notifyDamage();
                 game.playSfx("bad");

@@ -1,7 +1,7 @@
 /**
  * Displays the highscores UI section.
- * It makes the score banner, highscores container, and the action button visible
- * so the user can review results and trigger the next flow (retry/start).
+ * Makes the score banner, highscores container, and action button visible so the
+ * user can review results and continue the flow (retry/start).
  */
 function showHighScores() {
     const score = document.getElementById("score");
@@ -16,8 +16,8 @@ function showHighScores() {
 
 /**
  * Hides the highscores UI section.
- * It removes the score banner, highscores container, and action button from layout
- * so the gameplay view can take full focus.
+ * Removes the score banner, highscores container, and action button from layout
+ * so gameplay can take full focus.
  */
 function hideHighScores() {
     const score = document.getElementById("score");
@@ -32,11 +32,11 @@ function hideHighScores() {
 
 /**
  * Updates the score banner text in the highscores view.
- * In multiplayer, it explicitly shows the best score across both players.
+ * In multiplayer, displays the best score across both players.
  *
- * Two rendering modes exist:
- * - Session-based mode (direct=false): computes the best score from session storage.
- * - Direct mode (direct=true): computes the best score from explicitly provided values.
+ * Supports two data sources:
+ * - Session-based mode (direct=false): derives the best score from session storage.
+ * - Direct mode (direct=true): derives the best score from explicit score inputs.
  *
  * @param {number} numberOfPlayers - Active player count (1 or 2)
  * @param {boolean} direct - Whether scores are provided directly instead of read from session storage
@@ -44,7 +44,7 @@ function hideHighScores() {
  * @param {number|null} myUserFriendScore - Opponent score when using direct mode (multiplayer)
  */
 function set_score_text(numberOfPlayers, direct=false, thisScore=null, myUserFriendScore=null) {
-    // Builds the label prefix; multiplayer emphasizes the best-of summary.
+    // Builds the label prefix; multiplayer emphasizes a best-of summary.
     let text = "Score: ";
     let max_score = 0;
     let scoreValue = "";
@@ -65,6 +65,7 @@ function set_score_text(numberOfPlayers, direct=false, thisScore=null, myUserFri
         }
     }
     else if ((numberOfPlayers === 1) && direct) {
+        // Direct mode in single-player uses the provided score as-is.
         max_score = thisScore;
     }
     
@@ -80,14 +81,15 @@ function set_score_text(numberOfPlayers, direct=false, thisScore=null, myUserFri
             }
         }        
     }
-    // Updates the UI element with the computed best score.
+
+    // Commits the computed value to the score banner element.
     scoreValue = text + String(max_score);
     scoreValueElement.textContent = scoreValue;
 }
 
 /**
  * Rebuilds the highscores table body.
- * It always renders exactly 10 rows to preserve layout stability.
+ * Renders a fixed number of rows to preserve layout stability.
  * Missing entries are represented by placeholder values.
  */
 function set_highscore_table() {
@@ -105,7 +107,7 @@ function set_highscore_table() {
         const nameCell = document.createElement("td");
         const scoreCell = document.createElement("td");
 
-        // Rank is always displayed, even for empty slots.
+        // Renders the rank label; the top row is highlighted as a "major" rank.
         if (i === 0) {
             row.id = "majored";
             rankCell.textContent = "MAJOR";
@@ -114,7 +116,7 @@ function set_highscore_table() {
             rankCell.textContent = (i + 1).toString();
         }
 
-        // Populates the row when a stored highscore exists for the current index.
+        // Populates the row when a stored highscore exists at this index.
         if (HIGHSCORES.length > i) {
             nameCell.textContent = HIGHSCORES[i].name;
             scoreCell.textContent = HIGHSCORES[i].score;
@@ -125,20 +127,21 @@ function set_highscore_table() {
             scoreCell.textContent = "-";
         }
 
+        // Appends cells in display order: rank, name, score.
         row.appendChild(rankCell);
         row.appendChild(nameCell);
         row.appendChild(scoreCell);
 
+        // Attaches the row to the table body.
         TABLE_BODY.appendChild(row);
     }
 }
 
 /**
  * Orchestrates the highscores rendering workflow.
- * It can optionally update persisted highscores, then refreshes the score banner
- * and rebuilds the highscores table.
+ * Optionally updates persisted highscores, then refreshes the score banner and table.
  *
- * Two modes exist:
+ * Supports two execution paths:
  * - Direct mode: uses explicitly provided user/score pairs (useful for multiplayer coordination).
  * - Session-based mode: reads per-player scores from session storage.
  *
@@ -151,26 +154,27 @@ function set_highscore_table() {
  * @param {number|null} myUserFriendScore - Opponent score in direct mode
  */
 function printHighScores(numberOfPlayers, update, direct=false, thisUser=null, thisScore=null, myUserFriend=null, myUserFriendScore=null) {
-    // Direct mode typically occurs when multiplayer game-over results are coordinated externally.
+    // Direct mode typically occurs when multiplayer results are coordinated externally.
     if (direct && update) {
-        // Updates highscores only when requested.
+        // Persists highscores for the provided player context.
         update_highscores(thisUser, thisScore);
         if (numberOfPlayers === 2) {
             update_highscores(myUserFriend, myUserFriendScore);
         }
-        // Refreshes UI after optional persistence.
+
+        // Refreshes UI after persistence using direct-score rendering.
         set_score_text(numberOfPlayers, direct, thisScore);
         set_highscore_table();
     } 
     else {
-        // Updates highscores only when requested.
+        // Session-based mode optionally persists highscores using stored per-player scores.
         if (update) {
             for (let i = 1; i <= numberOfPlayers; i++) {
                 update_highscores(`Player ${i}`, get_score_session(`Player ${i}`));
             }
         }
 
-        // Refreshes UI after optional persistence.
+        // Refreshes UI after optional persistence using session-derived scores.
         set_score_text(numberOfPlayers);
         set_highscore_table();
     }

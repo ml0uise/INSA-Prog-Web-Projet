@@ -1,42 +1,44 @@
 /**
  * Global session configuration and control mappings.
- * Each player entry encodes: [playerLabel, leftKeyCode, rightKeyCode].
+ * Encodes each player definition as: [playerLabel, leftKeyCode, rightKeyCode].
  *
- * Note: the chosen bindings reflect an AZERTY-friendly setup:
- * - Player 1 uses Q/D
- * - Player 2 uses ArrowLeft/ArrowRight
+ * Uses an AZERTY-friendly control scheme:
+ * - Player 1 is mapped to Q / D
+ * - Player 2 is mapped to ArrowLeft / ArrowRight
  */
 let numberOfPlayers = 1;
 let player1 = ["Player 1", "KeyA", "KeyD"];
 let player2 = ["Player 2", "ArrowLeft", "ArrowRight"];
 
 /**
- * Global runtime flags controlling UI flow and input gating.
- * - preview: initial boot where engines can render without starting an active run
- * - isGaming: indicates whether the game canvases are currently displayed
- * - playing: gates menu-level inputs while a run is active
+ * Global runtime flags controlling application flow and input gating.
+ * - preview: initial boot state where engines render without starting active gameplay
+ * - isGaming: indicates whether the gameplay canvases are currently visible
+ * - isPlaying: disables menu-level input while a run is in progress
  */
 let preview = true;
 let isGaming = true;
 let isPlaying = false;
 
-// Attach global listeners
+// Attaches global menu-level input listeners.
 attachMenuInput();
 
 /**
- * Instantiates engine instances eagerly so assets and audio objects are loaded early.
- * Each instance is configured with its own user identifier and control mapping.
+ * Eagerly instantiates game engine instances so assets and audio are preloaded.
+ * Each instance is bound to a specific user identifier and control mapping.
  *
- * Note: game2 is initialized with a fixed player-count argument to ensure it
- * can be preview-started and later switched into two-player mode.
+ * Initializes the second engine with a fixed player-count to allow preview startup
+ * and later promotion to two-player mode without re-instantiation.
  */
 const game1 = initialiseGame(player1[0], numberOfPlayers, player1[1], player1[2]);
 const game2 = initialiseGame(player2[0], 2, player2[1], player2[2]);
 
 /**
- * Boot sequence:
- * Starts the application in preview mode so visuals and assets are initialized.
- * The second engine instance is started as well to ensure it is ready when
+ * Boot sequence.
+ * Starts the application in preview mode so visuals, assets, and audio objects
+ * are initialized before active gameplay begins.
+ *
+ * Starts the second engine as well to ensure it is immediately ready when
  * two-player mode is enabled.
  */
 startGame(numberOfPlayers, preview);
