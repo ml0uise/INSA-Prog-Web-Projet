@@ -102,7 +102,7 @@ const gamePrototype = {
        Bootstrap / lifecycle
     ========================= */
 
-/**
+    /**
      * Attaches keyboard and touch listeners for player controls.
      * Treats this operation as idempotent to avoid duplicate listener registration.
      */
@@ -377,10 +377,12 @@ const gamePrototype = {
         let right = false;
 
         // Caps processing to two fingers to match the intended control scheme.
-        const count = Math.min(2, e.touches.length);
+        const touches = e.targetTouches;
+        const count = Math.min(2, touches.length);
+
         for (let i = 0; i < count; i++) {
             // Converts clientX to a position relative to the canvas.
-            let x = e.touches[i].clientX - rect.left;
+            const x = touches[i].clientX - rect.left;
 
             // Splits the canvas into left/right halves for directional input.
             if (x < rect.width / 2) left = true;

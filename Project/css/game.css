@@ -87,6 +87,7 @@ canvas {
         0 0 4.8vh #00e1ff;
 
     cursor: pointer;
+    touch-action: none;
 
     animation: canvasBlink 1s infinite;
     
