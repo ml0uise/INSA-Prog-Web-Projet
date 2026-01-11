@@ -212,7 +212,7 @@ function increment_game_state(user, score) {
         let gameStateUser = sessionStorage.getItem("game_state_user");
         let gameStateScore = sessionStorage.getItem("game_state_score");
         return [true, gameStateUser, gameStateScore];
-    } 
+    }
 }
 
 /**

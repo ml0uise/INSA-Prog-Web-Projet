@@ -79,7 +79,7 @@ function set_score_text(numberOfPlayers, direct=false, thisScore=null, myUserFri
             if (user_score > max_score) {
                 max_score = user_score;
             }
-        }        
+        }
     }
 
     // Commits the computed value to the score banner element.
